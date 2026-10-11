@@ -1,0 +1,4 @@
+node_modules/
+.env
+# signing key for login sessions — generated automatically on first run
+data/secret.key

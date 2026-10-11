@@ -129,6 +129,19 @@
       "instructor": "Dr.Janes smith",
       "topics": "Network Security, Cryptography, Ethical Hacking, Risk Management",
       "outcome": "Understand core security concepts and protect systems from common cyber threats."
+    },
+    {
+      "id": "full-stack-web-development",
+      "title": "Full-Stack Web Development",
+      "section": "web-development",
+      "sectionLabel": "Web Development",
+      "level": "Intermediate",
+      "duration": "12 Weeks",
+      "hours": "53 Hours",
+      "rating": "4.7",
+      "instructor": "Ms. Sarah Chen",
+      "topics": "HTML, CSS, JavaScript, Node.js, Express, MongoDB",
+      "outcome": "Build and deploy full-stack web applications from scratch."
     }
   ],
   "students": [],

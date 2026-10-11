@@ -1,5 +1,4 @@
 import PageMeta from "../components/PageMeta";
-import LegacyScript from "../components/LegacyScript";
 
 export default function LoginChoice() {
     return (
@@ -56,7 +55,6 @@ export default function LoginChoice() {
                     </div>
                 </div>
             </div>
-            <LegacyScript />
         </>
     );
 }

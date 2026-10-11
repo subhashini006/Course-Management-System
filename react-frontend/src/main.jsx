@@ -1,20 +1,18 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
+import { CourseProvider } from "./context/CourseContext.jsx";
 import "./index.css";
 
-// NOTE: intentionally not wrapped in <StrictMode>. StrictMode
-// deliberately double-mounts every component in development to help
-// find bugs, which is great for pure-React code — but LegacyScript
-// bridges in the original app.js via a dynamically inserted <script>
-// tag, and that script loads asynchronously. StrictMode's synchronous
-// mount -> cleanup -> remount cycle removes the script before it has
-// a chance to actually execute, so app.js silently never runs in dev.
-// Production builds never double-invoke effects, so this only ever
-// mattered for `npm run dev` — but to keep dev and prod behaving the
-// same way, StrictMode is left off here.
+// AuthProvider knows who is logged in (asked from the backend);
+// CourseProvider fetches the course list once and shares it with every page.
 createRoot(document.getElementById("root")).render(
     <BrowserRouter>
-        <App />
+        <AuthProvider>
+            <CourseProvider>
+                <App />
+            </CourseProvider>
+        </AuthProvider>
     </BrowserRouter>
 );

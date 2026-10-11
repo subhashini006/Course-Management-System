@@ -1,5 +1,4 @@
 import PageMeta from "../components/PageMeta";
-import LegacyScript from "../components/LegacyScript";
 
 export default function Home() {
     return (
@@ -238,7 +237,6 @@ export default function Home() {
     
                 </p>
             </footer>
-            <LegacyScript />
         </>
     );
 }

@@ -1,37 +1,93 @@
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
-import LegacyScript from "../components/LegacyScript";
+import StudentNav from "../components/StudentNav";
+import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
+import api, { errorMessage } from "../services/api";
+
+function EmptyState({ icon, title, message, buttonText }) {
+    return (
+        <div className="db-empty-state">
+            <div className="db-empty-icon">
+                <i className={`fa-solid fa-${icon}`}></i>
+            </div>
+            <h3>{title}</h3>
+            <p>{message}</p>
+            <Link to="/courses" className="db-empty-btn">
+                {buttonText}
+            </Link>
+        </div>
+    );
+}
+
+// Small SVG ring showing overall completion percentage
+function ProgressRing({ pct }) {
+    const size = 108;
+    const stroke = 12;
+    const r = (size - stroke) / 2;
+    const c = 2 * Math.PI * r;
+    const offset = c - (pct / 100) * c;
+    return (
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth={stroke} />
+            <circle
+                cx={size / 2}
+                cy={size / 2}
+                r={r}
+                fill="none"
+                stroke="var(--accent)"
+                strokeWidth={stroke}
+                strokeLinecap="round"
+                strokeDasharray={c}
+                strokeDashoffset={offset}
+                transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+            <text
+                x={size / 2}
+                y={size / 2 + 7}
+                textAnchor="middle"
+                fontSize="22"
+                fontWeight="700"
+                fill="var(--navy)"
+                fontFamily="Inter, sans-serif"
+            >
+                {pct}%
+            </text>
+        </svg>
+    );
+}
 
 export default function StudentDashboard() {
+    const { student, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
+    const [enrollments, setEnrollments] = useState(null);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (authLoading) return;
+        if (!student) {
+            navigate("/stu-login");
+            return;
+        }
+        api.get("/api/v1/me/enrollments")
+            .then(({ data }) => setEnrollments(data.data))
+            .catch((err) => setError(errorMessage(err)));
+    }, [authLoading, student, navigate]);
+
+    if (!student) {
+        return <PageMeta bodyClassName="" page="stu-dashboard" title="My Dashboard | StudyVerse" />;
+    }
+
+    const list = enrollments || [];
+    const inProgress = list.filter((e) => e.status === "in-progress");
+    const completed = list.filter((e) => e.status === "completed");
+    const overallPct = list.length > 0 ? Math.round((completed.length / list.length) * 100) : 0;
+
     return (
         <>
             <PageMeta bodyClassName="" page="stu-dashboard" title="My Dashboard | StudyVerse" />
-            {/* ================= NAVBAR ================= */}
-            <nav className="navbar">
-                <div className="logo">
-                    <i className="fa-solid fa-graduation-cap"></i>
-                    <span>StudyVerse</span>
-                </div>
-                <ul className="nav-links">
-                    <li>
-                        <a href="/">Home</a>
-                    </li>
-                    <li>
-                        <a href="/courses">Courses</a>
-                    </li>
-                    <li>
-                        <a href="notifications.html">Notifications</a>
-                    </li>
-                    <li>
-                        <a href="about.html">About</a>
-                    </li>
-                    <li>
-                        <a href="contact.html">Contact</a>
-                    </li>
-                </ul>
-                <div className="nav-buttons">
-                    <a href="#" className="login-btn" onClick={(e) => { e.preventDefault(); window.logoutStudent(); }}>Logout</a>
-                </div>
-            </nav>
+            <StudentNav />
             {/* ================= DASHBOARD HEADER ================= */}
             <div className="db-header">
                 <div className="db-header-inner">
@@ -41,42 +97,48 @@ export default function StudentDashboard() {
                         </div>
                         <div>
                             <p className="db-greeting">Welcome back,</p>
-                            <h1 className="db-name" id="studentNameHeading">Student</h1>
+                            <h1 className="db-name">{student.name}</h1>
                             <p className="db-meta">
                                 <i className="fa-solid fa-envelope"></i>
-                                <span id="studentEmailMeta">-</span>
+                                <span>{student.email}</span>
                             </p>
                         </div>
                     </div>
-                    <div style={{display: "flex", gap: "12px", flexWrap: "wrap"}}>
-                        <a href="/courses" className="db-explore-btn">
-                            <i className="fa-solid fa-magnifying-glass"></i>
-                             Explore Courses
-                
-                        </a>
+                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                        <Link to="/courses" className="db-explore-btn">
+                            <i className="fa-solid fa-magnifying-glass"></i> Explore Courses
+                        </Link>
                     </div>
                 </div>
             </div>
             {/* ================= MAIN CONTENT ================= */}
             <main className="db-main">
+                {error && (
+                    <p className="auth-error">
+                        <i className="fa-solid fa-circle-exclamation"></i> {error}
+                    </p>
+                )}
                 {/* ===== OVERALL PROGRESS ===== */}
-                <section className="db-section db-section--full" style={{marginBottom: "24px"}}>
+                <section className="db-section db-section--full" style={{ marginBottom: "24px" }}>
                     <div className="db-section-header">
                         <h2>
-                            <i className="fa-solid fa-bullseye"></i>
-                             Overall Completion
+                            <i className="fa-solid fa-bullseye"></i> Overall Completion
                         </h2>
                     </div>
-                    <div style={{display: "flex", alignItems: "center", gap: "28px", flexWrap: "wrap", padding: "6px 2px"}}>
-                        <div id="overallRing" style={{flexShrink: "0"}}></div>
-                        <div style={{flex: "1", minWidth: "220px"}}>
-                            <div className="course-progress-card" style={{marginBottom: "0"}}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "28px", flexWrap: "wrap", padding: "6px 2px" }}>
+                        <div style={{ flexShrink: 0 }}>
+                            <ProgressRing pct={overallPct} />
+                        </div>
+                        <div style={{ flex: 1, minWidth: "220px" }}>
+                            <div className="course-progress-card" style={{ marginBottom: 0 }}>
                                 <div className="course-progress-card-top">
-                                    <span id="overallLabel">0 of 0 courses completed</span>
-                                    <small id="overallPct">0%</small>
+                                    <span>
+                                        {completed.length} of {list.length} courses completed
+                                    </span>
+                                    <small>{overallPct}%</small>
                                 </div>
                                 <div className="progress-track">
-                                    <div className="progress-fill" id="overallFill" style={{width: "0%"}}></div>
+                                    <div className="progress-fill" style={{ width: `${overallPct}%` }}></div>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +152,7 @@ export default function StudentDashboard() {
                         </div>
                         <div className="db-stat-info">
                             <span className="db-stat-label">Enrolled Courses</span>
-                            <span className="db-stat-value" id="statEnrolled">0</span>
+                            <span className="db-stat-value">{list.length}</span>
                         </div>
                     </div>
                     <div className="db-stat-card">
@@ -99,7 +161,7 @@ export default function StudentDashboard() {
                         </div>
                         <div className="db-stat-info">
                             <span className="db-stat-label">Completed</span>
-                            <span className="db-stat-value" id="statCompleted">0</span>
+                            <span className="db-stat-value">{completed.length}</span>
                         </div>
                     </div>
                     <div className="db-stat-card">
@@ -108,7 +170,7 @@ export default function StudentDashboard() {
                         </div>
                         <div className="db-stat-info">
                             <span className="db-stat-label">In Progress</span>
-                            <span className="db-stat-value" id="statInProgress">0</span>
+                            <span className="db-stat-value">{inProgress.length}</span>
                         </div>
                     </div>
                     <div className="db-stat-card">
@@ -117,7 +179,7 @@ export default function StudentDashboard() {
                         </div>
                         <div className="db-stat-info">
                             <span className="db-stat-label">Certificates</span>
-                            <span className="db-stat-value" id="statCerts">0</span>
+                            <span className="db-stat-value">{completed.length}</span>
                         </div>
                     </div>
                 </div>
@@ -125,67 +187,142 @@ export default function StudentDashboard() {
                 <div className="db-grid">
                     {/* LEFT: Learning Progress */}
                     <section className="db-section">
-                        <div className="db-section-header" style={{display: "flex", alignItems: "center", justifyContent: "space-between"}}>
+                        <div className="db-section-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <h2>
-                                <i className="fa-solid fa-chart-line"></i>
-                                 Learning Progress
+                                <i className="fa-solid fa-chart-line"></i> Learning Progress
                             </h2>
                         </div>
-                        <div id="inProgressList"></div>
+                        <div>
+                            {inProgress.length === 0 ? (
+                                <EmptyState
+                                    icon="chart-line"
+                                    title="No courses in progress"
+                                    message="Once you enrol in a course, your progress will appear here."
+                                    buttonText="Browse Courses"
+                                />
+                            ) : (
+                                inProgress.map((course) => (
+                                    <div className="db-course-item" style={{ flexDirection: "column", alignItems: "stretch", gap: "10px" }} key={course.id}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                                            <div className="db-course-item-left">
+                                                <div className="db-course-item-icon">
+                                                    <i className="fa-solid fa-book-open"></i>
+                                                </div>
+                                                <div>
+                                                    <p className="db-course-item-name">{course.courseName}</p>
+                                                    <p className="db-course-item-meta">
+                                                        <i className="fa-solid fa-user"></i> {course.name} &nbsp;·&nbsp;{" "}
+                                                        <i className="fa-solid fa-id-card"></i> {course.roll}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Link
+                                                to={`/course?course=${encodeURIComponent(course.courseId)}`}
+                                                className="db-complete-btn"
+                                                style={{ textDecoration: "none" }}
+                                            >
+                                                <i className="fa-solid fa-play"></i> Continue
+                                            </Link>
+                                        </div>
+                                        <div>
+                                            <div className="progress-track">
+                                                <div className="progress-fill" style={{ width: `${course.progressPercent}%` }}></div>
+                                            </div>
+                                            <span style={{ fontSize: "11.5px", color: "var(--text-muted)" }}>{course.progressPercent}% complete</span>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </section>
                     {/* RIGHT: My Courses */}
                     <section className="db-section">
                         <div className="db-section-header">
                             <h2>
-                                <i className="fa-solid fa-book-open"></i>
-                                 My Courses
+                                <i className="fa-solid fa-book-open"></i> My Courses
                             </h2>
                         </div>
-                        <div id="myCoursesList"></div>
+                        <div>
+                            {list.length === 0 ? (
+                                <EmptyState
+                                    icon="book-bookmark"
+                                    title="No courses enrolled yet"
+                                    message="Enrol in your first course to see it listed here."
+                                    buttonText="Start Learning"
+                                />
+                            ) : (
+                                list.map((course) => {
+                                    const done = course.status === "completed";
+                                    return (
+                                        <div className="db-course-item" style={{ flexDirection: "column", alignItems: "stretch", gap: "10px" }} key={course.id}>
+                                            <div className="db-course-item-left">
+                                                <div className={`db-course-item-icon ${done ? "db-course-item-icon--done" : ""}`}>
+                                                    <i className={`fa-solid fa-${done ? "circle-check" : "book-open"}`}></i>
+                                                </div>
+                                                <div>
+                                                    <p className="db-course-item-name">{course.courseName}</p>
+                                                    <span className={`db-course-status ${done ? "db-status--done" : "db-status--progress"}`}>
+                                                        {done ? "Completed" : "In Progress"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="progress-track">
+                                                    <div className="progress-fill" style={{ width: `${course.progressPercent}%` }}></div>
+                                                </div>
+                                                <span style={{ fontSize: "11.5px", color: "var(--text-muted)" }}>{course.progressPercent}% complete</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
                     </section>
                 </div>
                 {/* ===== COMPLETED COURSES ===== */}
                 <section className="db-section db-section--full">
                     <div className="db-section-header">
                         <h2>
-                            <i className="fa-solid fa-trophy"></i>
-                             Completed Courses
+                            <i className="fa-solid fa-trophy"></i> Completed Courses
                         </h2>
                     </div>
-                    <div id="completedList"></div>
+                    <div>
+                        {completed.length === 0 ? (
+                            <EmptyState
+                                icon="trophy"
+                                title="No completions yet"
+                                message="Courses you finish will appear here along with your certificates."
+                                buttonText="Explore Courses"
+                            />
+                        ) : (
+                            completed.map((course) => (
+                                <div className="db-course-item" key={course.id}>
+                                    <div className="db-course-item-left">
+                                        <div className="db-course-item-icon db-course-item-icon--done">
+                                            <i className="fa-solid fa-circle-check"></i>
+                                        </div>
+                                        <div>
+                                            <p className="db-course-item-name">{course.courseName}</p>
+                                            <p className="db-course-item-meta">
+                                                <i className="fa-solid fa-user"></i> {course.name} &nbsp;·&nbsp;{" "}
+                                                <i className="fa-solid fa-id-card"></i> {course.roll}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <Link
+                                        to={`/certificate?course=${encodeURIComponent(course.courseId)}`}
+                                        className="db-cert-badge"
+                                        style={{ textDecoration: "none" }}
+                                    >
+                                        <i className="fa-solid fa-certificate"></i> View Certificate
+                                    </Link>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </section>
             </main>
-            {/* ================= FOOTER ================= */}
-            <footer>
-                <div className="footer-content">
-                    <div>
-                        <h2>StudyVerse</h2>
-                        <p>Your trusted online learning platform.</p>
-                    </div>
-                    <div>
-                        <h3>Quick Links</h3>
-                        <p>Home</p>
-                        <p>Courses</p>
-                        <p>About</p>
-                        <p>Contact</p>
-                    </div>
-                    <div>
-                        <h3>Contact</h3>
-                        <p>Email : support@StudyVerse.com</p>
-                        <p>Phone : +91 9876543210</p>
-                    </div>
-                    <div>
-                        <h3>Follow Us</h3>
-                        <i className="fab fa-facebook"></i>
-                        <i className="fab fa-instagram"></i>
-                        <i className="fab fa-linkedin"></i>
-                        <i className="fab fa-github"></i>
-                    </div>
-                </div>
-                <hr />
-                <p className="copyright">© 2026 StudyVerse | Student Course Management System</p>
-            </footer>
-            <LegacyScript />
+            <Footer />
         </>
     );
 }

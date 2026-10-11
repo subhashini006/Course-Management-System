@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
-import LegacyScript from "../components/LegacyScript";
-import { API_BASE } from "../api";
+import Footer from "../components/Footer";
+import { useCourses } from "../context/CourseContext";
+import { useAuth } from "../context/AuthContext";
+import api, { errorMessage } from "../services/api";
 
 const SECTION_META = {
     ai: { label: "Artificial Intelligence", tag: "AI", icon: "fa-robot" },
@@ -14,8 +17,8 @@ function badgeClass(level) {
     return "c-badge";
 }
 
-// Preserves the order sections first appear in the API response,
-// grouping courses under their "section" field (e.g. "ai", "ml").
+// Groups courses under their "section" (e.g. "ai", "ml"), keeping the order
+// in which sections first appear. A brand-new category gets its own section.
 function groupBySection(courses) {
     const order = [];
     const groups = {};
@@ -31,29 +34,95 @@ function groupBySection(courses) {
 }
 
 export default function Courses() {
-    // null = still loading, [] / [...] = loaded, error set = fetch failed
-    const [courses, setCourses] = useState(null);
-    const [error, setError] = useState(null);
+    const { courses, loading, error, refresh } = useCourses();
+    const { student, logout } = useAuth();
+    const navigate = useNavigate();
 
+    const [query, setQuery] = useState("");
+    // Enrollment modal: which course, which step, and the form state
+    const [enrolling, setEnrolling] = useState(null);
+    const [step, setStep] = useState("form");
+    const [roll, setRoll] = useState("");
+    const [formError, setFormError] = useState("");
+    const [busy, setBusy] = useState(false);
+    const [startLink, setStartLink] = useState("#");
+
+    // Pick up changes made elsewhere (e.g. another admin adding a course)
     useEffect(() => {
-        let cancelled = false;
-        fetch(`${API_BASE}/courses`)
-            .then((res) => {
-                if (!res.ok) throw new Error(`API returned ${res.status}`);
-                return res.json();
-            })
-            .then((data) => {
-                if (!cancelled) setCourses(data);
-            })
-            .catch((err) => {
-                if (!cancelled) setError(err.message || "Network error");
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, []);
+        refresh();
+    }, [refresh]);
 
-    const sections = courses ? groupBySection(courses) : [];
+    const sections = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        const visible = q
+            ? courses.filter((c) =>
+                  [c.title, c.instructor, c.topics, c.sectionLabel, c.level].some((v) =>
+                      String(v || "").toLowerCase().includes(q)
+                  )
+              )
+            : courses;
+        return groupBySection(visible);
+    }, [courses, query]);
+
+    const modalOpen = enrolling !== null;
+
+    // Lock page scroll and allow Escape to close while the modal is open
+    useEffect(() => {
+        if (!modalOpen) return undefined;
+        document.body.style.overflow = "hidden";
+        const onKey = (e) => {
+            if (e.key === "Escape") setEnrolling(null);
+        };
+        document.addEventListener("keydown", onKey);
+        return () => {
+            document.body.style.overflow = "";
+            document.removeEventListener("keydown", onKey);
+        };
+    }, [modalOpen]);
+
+    // After a successful enrollment, take the student into the course
+    useEffect(() => {
+        if (step !== "success") return undefined;
+        const timer = setTimeout(() => navigate(startLink), 1800);
+        return () => clearTimeout(timer);
+    }, [step, startLink, navigate]);
+
+    function openEnrollModal(course) {
+        if (!student) {
+            if (confirm("Please log in to enroll in a course. Go to the login page now?")) {
+                navigate("/stu-login");
+            }
+            return;
+        }
+        setRoll("");
+        setFormError("");
+        setStep("form");
+        setEnrolling(course);
+    }
+
+    async function submitEnrollment(e) {
+        e.preventDefault();
+        if (!roll.trim()) {
+            setFormError("Please fill in both your name and roll number.");
+            return;
+        }
+        setFormError("");
+        setBusy(true);
+        try {
+            await api.post("/api/v1/enrollments", { courseId: enrolling.id, name: student.name, roll: roll.trim() });
+            setStartLink(`/course?course=${encodeURIComponent(enrolling.id)}`);
+            setStep("success");
+        } catch (err) {
+            setFormError(errorMessage(err));
+        }
+        setBusy(false);
+    }
+
+    async function handleLogout(e) {
+        e.preventDefault();
+        await logout();
+        navigate("/stu-login");
+    }
 
     return (
         <>
@@ -66,13 +135,15 @@ export default function Courses() {
                 </div>
                 <ul className="nav-links">
                     <li>
-                        <a href="/">Home</a>
+                        <Link to="/">Home</Link>
                     </li>
                     <li>
-                        <a href="/courses" className="active-nav">Courses</a>
+                        <Link to="/courses" className="active-nav">
+                            Courses
+                        </Link>
                     </li>
                     <li id="notifNavItem">
-                        <a href="notifications.html">Notifications</a>
+                        {student ? <Link to="/stu-dashboard">Student Dashboard</Link> : <Link to="/notifications">Notifications</Link>}
                     </li>
                     <li>
                         <a href="about.html">About</a>
@@ -81,11 +152,19 @@ export default function Courses() {
                         <a href="contact.html">Contact</a>
                     </li>
                     <li>
-                        <a href="/add-course-edit">Add Course</a>
+                        <Link to="/add-course-edit">Add Course</Link>
                     </li>
                 </ul>
                 <div className="nav-buttons" id="navAuthArea">
-                    <a href="/login-choice" className="login-btn">Login / Register</a>
+                    {student ? (
+                        <a href="#" className="login-btn" onClick={handleLogout}>
+                            <i className="fa-solid fa-right-from-bracket"></i> Logout ({student.name})
+                        </a>
+                    ) : (
+                        <Link to="/login-choice" className="login-btn">
+                            Login / Register
+                        </Link>
+                    )}
                 </div>
             </nav>
             {/* ================= PAGE HEADER ================= */}
@@ -94,33 +173,43 @@ export default function Courses() {
                 <p>Handpicked courses across the most in-demand tech domains — start learning today.</p>
                 <div className="courses-search-box">
                     <i className="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="courseSearch" placeholder="Search courses..." />
+                    <input
+                        type="text"
+                        id="courseSearch"
+                        placeholder="Search courses..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                    />
                 </div>
             </section>
-            {/* ================= COURSES CONTENT (fetched from the mock API) ================= */}
+            {/* ================= COURSES CONTENT (from the backend) ================= */}
             <main className="courses-main">
                 {error && (
                     <div className="course-section" style={{ textAlign: "center", padding: "40px 20px" }}>
-                        <p style={{ color: "#c0392b", fontWeight: 600 }}>
-                            Couldn&apos;t load courses from the API ({error}).
-                        </p>
+                        <p style={{ color: "#c0392b", fontWeight: 600 }}>Couldn&apos;t load courses ({error}).</p>
                         <p style={{ color: "var(--text-muted)" }}>
-                            Make sure the mock API is running — open a terminal in the <code>mockapi</code> folder
-                            and run <code>npm start</code>, then refresh this page.
+                            Make sure the backend is running — open a terminal in the <code>backend</code> folder and run{" "}
+                            <code>npm start</code>, then refresh this page.
                         </p>
                     </div>
                 )}
 
-                {!error && !courses && (
+                {loading && (
                     <div className="course-section" style={{ textAlign: "center", padding: "40px 20px" }}>
                         <p>Loading courses…</p>
                     </div>
                 )}
 
+                {!loading && !error && sections.length === 0 && (
+                    <div className="course-section" style={{ textAlign: "center", padding: "40px 20px" }}>
+                        <p>{query ? "No courses match your search." : "No courses available yet."}</p>
+                    </div>
+                )}
+
                 {sections.map(({ section, items }) => {
                     const meta = SECTION_META[section] || {
-                        label: section,
-                        tag: section.toUpperCase(),
+                        label: items[0].sectionLabel || section,
+                        tag: (items[0].sectionLabel || section).slice(0, 12).toUpperCase(),
                         icon: "fa-layer-group",
                     };
                     return (
@@ -132,14 +221,16 @@ export default function Courses() {
                                     </div>
                                     <div>
                                         <h2>
-                                            {meta.label} <span className="section-tag">{meta.tag}</span>
+                                            {meta.label} {SECTION_META[section] && <span className="section-tag">{meta.tag}</span>}
                                         </h2>
-                                        <p className="section-count">{items.length} Courses</p>
+                                        <p className="section-count">
+                                            {items.length} {items.length === 1 ? "Course" : "Courses"}
+                                        </p>
                                     </div>
                                 </div>
-                                <a href="/add-course-edit" className="admin-section-btn">
+                                <Link to="/add-course-edit" className="admin-section-btn">
                                     <i className="fa-solid fa-plus"></i> Add Course
-                                </a>
+                                </Link>
                             </div>
                             <div className="courses-grid">
                                 {items.map((course) => (
@@ -156,20 +247,16 @@ export default function Courses() {
                                                 </span>
                                             </div>
                                             <div className="c-card-actions">
-                                                <button
-                                                    type="button"
-                                                    className="enroll-btn"
-                                                    onClick={(e) => window.openEnrollModal(e.currentTarget)}
-                                                >
+                                                <button type="button" className="enroll-btn" onClick={() => openEnrollModal(course)}>
                                                     <i className="fa-solid fa-graduation-cap"></i> Enroll
                                                 </button>
-                                                <a
-                                                    href={`/edit-course-login?course=${course.id}`}
+                                                <Link
+                                                    to={`/edit-course-login?course=${encodeURIComponent(course.id)}`}
                                                     className="admin-edit-btn"
                                                     title="Edit Course"
                                                 >
                                                     <i className="fa-solid fa-pen-to-square"></i>
-                                                </a>
+                                                </Link>
                                             </div>
                                             <details className="c-details">
                                                 <summary className="view-details-btn">
@@ -180,7 +267,8 @@ export default function Courses() {
                                                         <strong>Instructor:</strong> {course.instructor}
                                                     </p>
                                                     <p>
-                                                        <strong>Duration:</strong> {course.duration} &middot; {course.hours}
+                                                        <strong>Duration:</strong> {course.duration}
+                                                        {course.hours && <> &middot; {course.hours}</>}
                                                     </p>
                                                     <p>
                                                         <strong>Topics:</strong> {course.topics}
@@ -188,6 +276,11 @@ export default function Courses() {
                                                     <p>
                                                         <strong>Outcome:</strong> {course.outcome}
                                                     </p>
+                                                    {course.prereqs && (
+                                                        <p>
+                                                            <strong>Prerequisites:</strong> {course.prereqs}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </details>
                                         </div>
@@ -198,98 +291,78 @@ export default function Courses() {
                     );
                 })}
             </main>
-            {/* ================= FOOTER ================= */}
-            <footer>
-                <div className="footer-content">
-                    <div>
-                        <h2>StudyVerse</h2>
-                        <p>Your trusted online learning platform.</p>
-                    </div>
-                    <div>
-                        <h3>Quick Links</h3>
-                        <p>Home</p>
-                        <p>Courses</p>
-                        <p>About</p>
-                        <p>Contact</p>
-                    </div>
-                    <div>
-                        <h3>Contact</h3>
-                        <p>Email : support@StudyVerse.com</p>
-                        <p>Phone : +91 9876543210</p>
-                    </div>
-                    <div>
-                        <h3>Follow Us</h3>
-                        <i className="fab fa-facebook"></i>
-                        <i className="fab fa-instagram"></i>
-                        <i className="fab fa-linkedin"></i>
-                        <i className="fab fa-github"></i>
-                    </div>
-                </div>
-                <hr />
-                <p className="copyright">© 2026 StudyVerse | Student Course Management System</p>
-            </footer>
+            <Footer />
             {/* ================= ENROLLMENT MODAL ================= */}
-            <div className="enroll-modal-overlay" id="enrollModalOverlay">
+            <div
+                className={`enroll-modal-overlay${modalOpen ? " active" : ""}`}
+                id="enrollModalOverlay"
+                onClick={(e) => {
+                    if (e.target === e.currentTarget) setEnrolling(null);
+                }}
+            >
                 <div className="enroll-modal">
-                    <button type="button" className="enroll-modal-close" onClick={() => window.closeEnrollModal()} aria-label="Close">
+                    <button type="button" className="enroll-modal-close" onClick={() => setEnrolling(null)} aria-label="Close">
                         <i className="fa-solid fa-xmark"></i>
                     </button>
-                    {/* Step 1 : Enrollment form */}
-                    <div className="enroll-modal-step" id="enrollFormStep">
-                        <div className="enroll-modal-icon">
-                            <i className="fa-solid fa-graduation-cap"></i>
-                        </div>
-                        <h2>Enroll in Course</h2>
-                        <p className="enroll-modal-course-name" id="enrollCourseName">Course Name</p>
-                        <form id="enrollForm" onSubmit={(e) => { const keepGoing = window.submitEnrollment(e); if (keepGoing === false) e.preventDefault(); }}>
-                            <div className="form-group">
-                                <label htmlFor="enrollStudentName">Full Name</label>
-                                <input type="text" id="enrollStudentName" placeholder="Enter your full name" required="" />
+                    {modalOpen && step === "form" && (
+                        <div className="enroll-modal-step" id="enrollFormStep">
+                            <div className="enroll-modal-icon">
+                                <i className="fa-solid fa-graduation-cap"></i>
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="enrollRollNo">Roll Number</label>
-                                <input type="text" id="enrollRollNo" placeholder="Enter your roll number" required="" />
+                            <h2>Enroll in Course</h2>
+                            <p className="enroll-modal-course-name" id="enrollCourseName">
+                                {enrolling.title}
+                            </p>
+                            <form id="enrollForm" onSubmit={submitEnrollment}>
+                                <div className="form-group">
+                                    <label htmlFor="enrollStudentName">Full Name</label>
+                                    <input type="text" id="enrollStudentName" value={student ? student.name : ""} readOnly />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="enrollRollNo">Roll Number</label>
+                                    <input
+                                        type="text"
+                                        id="enrollRollNo"
+                                        placeholder="Enter your roll number"
+                                        required
+                                        value={roll}
+                                        onChange={(e) => setRoll(e.target.value)}
+                                    />
+                                </div>
+                                <p className="enroll-modal-error" id="enrollFormError">
+                                    {formError}
+                                </p>
+                                <button type="submit" className="enroll-submit-btn" disabled={busy}>
+                                    <i className="fa-solid fa-paper-plane"></i> {busy ? "Submitting…" : "Submit"}
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                    {modalOpen && step === "success" && (
+                        <div className="enroll-modal-step" id="enrollSuccessStep">
+                            <div className="enroll-modal-icon enroll-modal-icon-success">
+                                <i className="fa-solid fa-circle-check"></i>
                             </div>
-                            <p className="enroll-modal-error" id="enrollFormError"></p>
-                            <button type="submit" className="enroll-submit-btn">
-                                <i className="fa-solid fa-paper-plane"></i>
-                                 Submit
-                    
-                            </button>
-                        </form>
-                    </div>
-                    {/* Step 2 : Success */}
-                    <div className="enroll-modal-step" id="enrollSuccessStep" style={{display: "none"}}>
-                        <div className="enroll-modal-icon enroll-modal-icon-success">
-                            <i className="fa-solid fa-circle-check"></i>
+                            <h2>Enrolled Successfully!</h2>
+                            <p className="enroll-modal-success-text">
+                                Thanks, <span>{student ? student.name : ""}</span> — you&apos;re now enrolled in{" "}
+                                <strong>{enrolling.title}</strong>.
+                            </p>
+                            <div className="enroll-modal-actions">
+                                <Link to={startLink} className="enroll-modal-btn enroll-modal-btn-primary">
+                                    <i className="fa-solid fa-book"></i> Start Learning Now
+                                </Link>
+                                <Link to="/stu-dashboard" className="enroll-modal-btn enroll-modal-btn-secondary">
+                                    <i className="fa-solid fa-gauge"></i> View Dashboard
+                                </Link>
+                            </div>
+                            <p style={{ fontSize: "12px", color: "var(--text-muted)", marginTop: "12px" }}>
+                                Taking you to the course in a couple of seconds...
+                            </p>
                         </div>
-                        <h2>Enrolled Successfully!</h2>
-                        <p className="enroll-modal-success-text">
-                                                Thanks, 
-                            <span id="enrollSuccessName"></span>
-                             — you're now enrolled in
-                    
-                            <strong id="enrollSuccessCourse"></strong>
-                            .
-                
-                        </p>
-                        <div className="enroll-modal-actions">
-                            <a href="#" id="startLearningBtn" className="enroll-modal-btn enroll-modal-btn-primary">
-                                <i className="fa-solid fa-book"></i>
-                                 Start Learning Now
-                    
-                            </a>
-                            <a href="/stu-dashboard" className="enroll-modal-btn enroll-modal-btn-secondary">
-                                <i className="fa-solid fa-gauge"></i>
-                                 View Dashboard
-                    
-                            </a>
-                        </div>
-                        <p id="autoRedirectNote" style={{fontSize: "12px", color: "var(--text-muted)", marginTop: "12px"}}></p>
-                    </div>
+                    )}
                 </div>
             </div>
-            {courses && <LegacyScript />}
         </>
     );
 }

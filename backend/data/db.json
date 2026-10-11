@@ -1,0 +1,796 @@
+{
+  "courses": [
+    {
+      "id": "ai1",
+      "title": "Introduction to AI",
+      "section": "ai",
+      "sectionLabel": "Artificial Intelligence",
+      "level": "Beginner",
+      "duration": "8 Weeks",
+      "hours": "40 Hours",
+      "rating": "4.8",
+      "instructor": "Dr. Alan Turing",
+      "topics": "History of AI, Search Algorithms, Knowledge Representation, Expert Systems",
+      "outcome": "Understand the foundations of AI and build simple intelligent agents.",
+      "prereqs": "Basic programming knowledge. No prior AI experience needed.",
+      "learn": [
+        "Understand the history and evolution of Artificial Intelligence",
+        "Implement basic search algorithms like BFS and DFS",
+        "Apply knowledge representation techniques",
+        "Build simple rule-based expert systems",
+        "Explore real-world AI applications across industries"
+      ],
+      "image": "https://picsum.photos/seed/ai1/400/220"
+    },
+    {
+      "id": "ai2",
+      "title": "Machine Perception",
+      "section": "ai",
+      "sectionLabel": "Artificial Intelligence",
+      "level": "Intermediate",
+      "duration": "10 Weeks",
+      "hours": "50 Hours",
+      "rating": "4.7",
+      "instructor": "Prof. Yann LeCun",
+      "topics": "Computer Vision Basics, Image Processing, Object Detection, CNNs",
+      "outcome": "Build systems that perceive and interpret visual data.",
+      "prereqs": "Python programming and basic ML knowledge required.",
+      "learn": [
+        "Process and analyze image data using Python libraries",
+        "Implement object detection algorithms",
+        "Build Convolutional Neural Networks (CNNs) from scratch",
+        "Apply transfer learning to visual recognition tasks",
+        "Deploy a working image classification system"
+      ],
+      "image": "https://picsum.photos/seed/ai2/400/220"
+    },
+    {
+      "id": "ai3",
+      "title": "AI for Healthcare",
+      "section": "ai",
+      "sectionLabel": "Artificial Intelligence",
+      "level": "Advanced",
+      "duration": "12 Weeks",
+      "hours": "60 Hours",
+      "rating": "4.9",
+      "instructor": "Dr. Eric Topol",
+      "topics": "Medical Imaging, Diagnostics, Drug Discovery, Ethics in Healthcare AI",
+      "outcome": "Apply AI techniques to solve real-world healthcare problems.",
+      "prereqs": "Deep learning fundamentals and Python proficiency required.",
+      "learn": [
+        "Apply AI to medical imaging and diagnostic workflows",
+        "Build predictive models for patient outcome analysis",
+        "Understand drug discovery pipelines powered by AI",
+        "Navigate ethics and regulations in healthcare AI",
+        "Work with real-world clinical datasets"
+      ],
+      "image": "https://picsum.photos/seed/ai3/400/220"
+    },
+    {
+      "id": "ai4",
+      "title": "Reinforcement Learning",
+      "section": "ai",
+      "sectionLabel": "Artificial Intelligence",
+      "level": "Advanced",
+      "duration": "14 Weeks",
+      "hours": "70 Hours",
+      "rating": "4.6",
+      "instructor": "Prof. David Silver",
+      "topics": "Q-Learning, Policy Gradients, Deep RL, OpenAI Gym",
+      "outcome": "Build agents that learn to make decisions through trial and reward.",
+      "prereqs": "Strong ML background and Python required. Linear algebra helpful.",
+      "learn": [
+        "Understand Markov Decision Processes and reward structures",
+        "Implement Q-Learning and SARSA algorithms",
+        "Train agents using policy gradient methods",
+        "Use OpenAI Gym to simulate environments",
+        "Build a Deep RL agent that plays games end-to-end"
+      ],
+      "image": "https://picsum.photos/seed/ai4/400/220"
+    },
+    {
+      "id": "ai5",
+      "title": "Generative AI",
+      "section": "ai",
+      "sectionLabel": "Artificial Intelligence",
+      "level": "Intermediate",
+      "duration": "10 Weeks",
+      "hours": "50 Hours",
+      "rating": "4.9",
+      "instructor": "Dr. Ian Goodfellow",
+      "topics": "GANs, VAEs, Diffusion Models, Prompt Engineering, LLMs",
+      "outcome": "Create generative models that produce text, images, and more.",
+      "prereqs": "Neural network fundamentals and Python required.",
+      "learn": [
+        "Build and train Generative Adversarial Networks (GANs)",
+        "Implement Variational Autoencoders (VAEs)",
+        "Understand diffusion models behind tools like DALL·E",
+        "Master prompt engineering for LLMs",
+        "Create AI-generated text, images, and code"
+      ],
+      "image": "https://picsum.photos/seed/ai5/400/220"
+    },
+    {
+      "id": "ml1",
+      "title": "ML Fundamentals",
+      "section": "ml",
+      "sectionLabel": "Machine Learning",
+      "level": "Beginner",
+      "duration": "10 Weeks",
+      "hours": "50 Hours",
+      "rating": "4.8",
+      "instructor": "Dr. Andrew Ng",
+      "topics": "Supervised Learning, Regression, Classification, Model Evaluation",
+      "outcome": "Understand core ML algorithms and apply them to datasets.",
+      "prereqs": "Basic Python and high school mathematics required.",
+      "learn": [
+        "Understand supervised vs unsupervised learning",
+        "Build regression and classification models",
+        "Evaluate models using cross-validation and metrics",
+        "Tune hyperparameters for better performance",
+        "Apply scikit-learn to real datasets"
+      ],
+      "image": "https://picsum.photos/seed/ml1/400/220"
+    },
+    {
+      "id": "ml2",
+      "title": "Feature Engineering",
+      "section": "ml",
+      "sectionLabel": "Machine Learning",
+      "level": "Intermediate",
+      "duration": "8 Weeks",
+      "hours": "40 Hours",
+      "rating": "4.6",
+      "instructor": "Dr. Kaggle Team",
+      "topics": "Data Cleaning, Encoding, Scaling, Dimensionality Reduction",
+      "outcome": "Prepare and transform raw data to significantly boost model performance.",
+      "prereqs": "ML Fundamentals and Pandas knowledge required.",
+      "learn": [
+        "Clean messy datasets and handle missing values",
+        "Encode categorical variables effectively",
+        "Scale and normalize numerical features",
+        "Reduce dimensionality using PCA and more",
+        "Select the most impactful features for your model"
+      ],
+      "image": "https://picsum.photos/seed/ml2/400/220"
+    },
+    {
+      "id": "ml3",
+      "title": "Deep Learning with TensorFlow",
+      "section": "ml",
+      "sectionLabel": "Machine Learning",
+      "level": "Advanced",
+      "duration": "14 Weeks",
+      "hours": "70 Hours",
+      "rating": "4.9",
+      "instructor": "Dr. Jeff Dean",
+      "topics": "Neural Networks, CNNs, RNNs, Transfer Learning, TensorFlow 2.x",
+      "outcome": "Design and train deep neural networks for real-world problems.",
+      "prereqs": "Solid ML background and Python required. Calculus helpful.",
+      "learn": [
+        "Design and train deep neural networks with TensorFlow 2.x",
+        "Build CNNs for image tasks and RNNs for sequences",
+        "Apply transfer learning to save training time",
+        "Use Keras for rapid model prototyping",
+        "Save, load and serve models for production"
+      ],
+      "image": "https://picsum.photos/seed/ml3/400/220"
+    },
+    {
+      "id": "ml4",
+      "title": "ML Deployment & MLOps",
+      "section": "ml",
+      "sectionLabel": "Machine Learning",
+      "level": "Advanced",
+      "duration": "10 Weeks",
+      "hours": "50 Hours",
+      "rating": "4.7",
+      "instructor": "Prof. Chip Huyen",
+      "topics": "Docker, FastAPI, CI/CD for ML, Monitoring, Model Drift",
+      "outcome": "Deploy and maintain ML models in production environments.",
+      "prereqs": "ML experience and basic Linux/command-line skills required.",
+      "learn": [
+        "Package ML models into Docker containers",
+        "Build REST APIs for model serving with FastAPI",
+        "Set up CI/CD pipelines for automated retraining",
+        "Monitor live models for drift and degradation",
+        "Use MLflow for experiment tracking and versioning"
+      ],
+      "image": "https://picsum.photos/seed/ml4/400/220"
+    },
+    {
+      "id": "cybersecurity-fundamentals",
+      "title": "Cybersecurity Fundamentals",
+      "section": "cybersecurity",
+      "sectionLabel": "Cybersecurity",
+      "level": "Beginner",
+      "duration": "8 Weeks",
+      "hours": "40 Hours",
+      "rating": "4.8",
+      "instructor": "Dr.Janes smith",
+      "topics": "Network Security, Cryptography, Ethical Hacking, Risk Management",
+      "outcome": "Understand core security concepts and protect systems from common cyber threats.",
+      "prereqs": "",
+      "learn": [
+        "Understand core security concepts and protect systems from common cyber threats."
+      ],
+      "image": "https://picsum.photos/seed/cybersecurity-fundamentals/400/220"
+    },
+    {
+      "id": "full-stack-web-development",
+      "title": "Full-Stack Web Development",
+      "section": "web-development",
+      "sectionLabel": "Web Development",
+      "level": "Intermediate",
+      "duration": "12 Weeks",
+      "hours": "53 Hours",
+      "rating": "4.7",
+      "instructor": "Ms. Sarah Chen",
+      "topics": "HTML, CSS, JavaScript, Node.js, Express, MongoDB",
+      "outcome": "Build and deploy full-stack web applications from scratch.",
+      "prereqs": "",
+      "learn": [
+        "Build and deploy full-stack web applications from scratch."
+      ],
+      "image": "https://picsum.photos/seed/full-stack-web-development/400/220"
+    }
+  ],
+  "students": [
+    {
+      "id": 1,
+      "username": "demo",
+      "name": "Demo Student",
+      "email": "demo@studyverse.com",
+      "department": "Computer Science",
+      "passwordHash": "bdb93cc68e2b841715bd7d1f75ebb7e1:b7fe2e703378d435acee7ea2489bfd23f2e6cb31dad4e3ba34c23c17dba6079dda5285d1710f8597d9d6ad159b046b5fe6101c4470c5716ace5ab4fe76234fe6",
+      "notificationsRead": [],
+      "createdAt": "2026-10-10T08:09:31.556Z"
+    }
+  ],
+  "enrollments": [],
+  "modules": [
+    {
+      "id": "ai2",
+      "type": "content",
+      "overview": "Machine Perception is about teaching computers to make sense of the physical world — sight, sound, and sensor data — the way humans do almost without thinking. This course walks through how machines see, hear, and interpret raw signals well enough to act on them.",
+      "topics": [
+        "Image formation and digital representation",
+        "Convolutional feature extraction",
+        "Object detection and tracking",
+        "Audio and speech signal basics",
+        "Multimodal sensor fusion"
+      ],
+      "units": [
+        {
+          "title": "How Machines See: Image Formation & Digital Representation",
+          "icon": "image",
+          "paragraphs": [
+            "Every image a computer processes starts as a grid of numbers. This unit covers how cameras and sensors convert light into pixel values, and why color spaces like RGB, HSV, and grayscale matter for different perception tasks.",
+            "We'll also look at common preprocessing steps — resizing, normalization, and noise reduction — that make raw images usable for downstream models."
+          ],
+          "bullets": [
+            "Pixels, channels, and color spaces",
+            "Camera sensors vs. digital images",
+            "Preprocessing: resizing, normalization, denoising",
+            "Why preprocessing choices affect model accuracy"
+          ]
+        },
+        {
+          "title": "Feature Extraction with Convolutional Networks",
+          "icon": "diagram-project",
+          "paragraphs": [
+            "Convolutional layers are the backbone of most modern perception systems. This unit explains how filters slide across an image to detect edges, textures, and increasingly abstract shapes as the network gets deeper.",
+            "You'll see how pooling and stride affect the resolution of extracted features, and why this hierarchy of features is what lets a model tell a cat from a car."
+          ],
+          "bullets": [
+            "Convolutional filters and receptive fields",
+            "Pooling and stride",
+            "Feature hierarchies: edges → shapes → objects",
+            "Common architectures: LeNet, VGG, ResNet at a glance"
+          ]
+        },
+        {
+          "title": "Object Detection & Tracking",
+          "icon": "crosshairs",
+          "paragraphs": [
+            "Recognizing that a cat is somewhere in an image is different from knowing exactly where. This unit covers bounding-box detection, from sliding windows to modern single-pass detectors.",
+            "We'll also cover the basics of tracking an object across video frames, which is what makes real-time perception systems — like a car recognizing a pedestrian — possible."
+          ],
+          "bullets": [
+            "Bounding boxes vs. segmentation masks",
+            "Single-shot vs. two-stage detectors",
+            "Non-max suppression",
+            "Frame-to-frame object tracking basics"
+          ]
+        },
+        {
+          "title": "Sound & Signal Perception",
+          "icon": "waveform-lines",
+          "paragraphs": [
+            "Perception isn't only visual. This unit shifts to audio: how sound waves are sampled into digital signals, and how spectrograms turn raw audio into something a neural network can learn from.",
+            "We'll connect this to simple speech and sound-event recognition tasks, showing the same feature-extraction ideas from vision carrying over to a completely different signal type."
+          ],
+          "bullets": [
+            "Sampling rate and digitizing sound",
+            "Spectrograms and Mel-frequency features",
+            "Speech vs. general sound-event recognition",
+            "Where audio and vision perception overlap"
+          ]
+        },
+        {
+          "title": "Multimodal Perception & Capstone Project",
+          "icon": "layer-group",
+          "paragraphs": [
+            "Real-world systems rarely rely on a single sense. This closing unit covers how vision, audio, and other sensor data — like LIDAR or depth cameras — get fused into a single, more reliable picture of the environment.",
+            "You'll wrap up by designing a small multimodal perception pipeline — the same kind of thinking used in robotics and autonomous vehicles."
+          ],
+          "bullets": [
+            "Sensor fusion strategies",
+            "Handling conflicting or noisy signals",
+            "Case study: perception in autonomous vehicles",
+            "Capstone: designing a simple multimodal pipeline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai3",
+      "type": "content",
+      "overview": "This course explores how AI is applied to real clinical and biomedical problems — from reading medical images to predicting patient risk — along with the safety and ethical guardrails that make healthcare AI different from AI anywhere else.",
+      "topics": [
+        "Medical imaging analysis",
+        "Clinical risk prediction",
+        "Working with electronic health records",
+        "Model interpretability in clinical settings",
+        "Regulatory and ethical considerations"
+      ],
+      "units": [
+        {
+          "title": "Medical Imaging & Diagnostic AI",
+          "icon": "x-ray",
+          "paragraphs": [
+            "Radiology, pathology, and dermatology have become some of AI's biggest healthcare success stories. This unit covers how convolutional models are trained to spot tumors, fractures, and other abnormalities in X-rays, CT scans, and MRIs.",
+            "We'll also discuss why medical imaging datasets are uniquely challenging — small sample sizes, class imbalance, and the real cost of a false negative."
+          ],
+          "bullets": [
+            "X-ray, CT, and MRI basics for ML practitioners",
+            "Detecting abnormalities: tumors, fractures, lesions",
+            "Class imbalance and rare-disease detection",
+            "Why false negatives matter more in healthcare"
+          ]
+        },
+        {
+          "title": "Predicting Patient Risk",
+          "icon": "heart-pulse",
+          "paragraphs": [
+            "Beyond images, AI is widely used to predict outcomes — readmission risk, sepsis onset, or disease progression — directly from structured patient data.",
+            "This unit covers how tabular clinical data gets turned into risk scores, and the trade-offs between simple, explainable models and more powerful black-box ones."
+          ],
+          "bullets": [
+            "Risk scoring from structured clinical data",
+            "Readmission and deterioration prediction",
+            "Explainable models vs. black-box accuracy",
+            "Handling missing and irregular clinical data"
+          ]
+        },
+        {
+          "title": "Working with Electronic Health Records",
+          "icon": "file-medical",
+          "paragraphs": [
+            "EHR data is messy, inconsistent, and deeply personal. This unit walks through how raw clinical notes and records get cleaned and structured into something a model can actually learn from.",
+            "You'll also see why natural language processing plays a growing role here, since so much clinical knowledge still lives in free-text doctor's notes."
+          ],
+          "bullets": [
+            "Structuring messy EHR data",
+            "Coding systems: ICD and SNOMED basics",
+            "NLP on clinical notes",
+            "Privacy-preserving data handling"
+          ]
+        },
+        {
+          "title": "Interpretability & Trust in Clinical AI",
+          "icon": "magnifying-glass-chart",
+          "paragraphs": [
+            "A doctor won't act on a prediction they can't understand or trust. This unit covers interpretability techniques that let clinicians see why a model made a recommendation, not just what it recommended.",
+            "We'll look at feature attribution methods and how they're used to build clinician trust and catch model errors before they reach a patient."
+          ],
+          "bullets": [
+            "Why interpretability matters more in healthcare",
+            "Feature attribution and saliency maps",
+            "Building clinician trust in model output",
+            "Catching spurious correlations before deployment"
+          ]
+        },
+        {
+          "title": "Ethics, Regulation & Capstone",
+          "icon": "scale-balanced",
+          "paragraphs": [
+            "Healthcare AI operates under real regulatory scrutiny — patient safety, bias, and liability all matter here in a way they don't in most other domains.",
+            "This closing unit covers the regulatory landscape at a high level and has you design a responsible-AI checklist for a healthcare model of your choice."
+          ],
+          "bullets": [
+            "Regulatory basics: FDA/CE-style approval concepts",
+            "Bias and fairness in clinical models",
+            "Liability and human-in-the-loop design",
+            "Capstone: a responsible-AI checklist for a real use case"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai4",
+      "type": "content",
+      "overview": "Reinforcement learning is about training an agent to make good decisions through trial, error, and reward — the same paradigm behind game-playing AI, robotics control, and recommendation systems that learn from user behavior.",
+      "topics": [
+        "Markov decision processes",
+        "Value-based methods (Q-learning)",
+        "Policy gradient methods",
+        "Exploration vs. exploitation",
+        "Deep RL and real-world applications"
+      ],
+      "units": [
+        {
+          "title": "Foundations: Markov Decision Processes",
+          "icon": "diagram-project",
+          "paragraphs": [
+            "Every RL problem starts as a Markov Decision Process: states, actions, rewards, and transitions. This unit builds that vocabulary from scratch with small, concrete examples.",
+            "We'll also introduce the discount factor and why an agent has to weigh immediate rewards against long-term payoff."
+          ],
+          "bullets": [
+            "States, actions, rewards, transitions",
+            "The Markov property",
+            "Discounted returns and the discount factor",
+            "Simple gridworld examples"
+          ]
+        },
+        {
+          "title": "Value-Based Methods: Q-Learning",
+          "icon": "table-cells",
+          "paragraphs": [
+            "This unit introduces value functions — how good is it to be in a given state, or take a given action — and builds up to Q-learning, one of the earliest and most influential RL algorithms.",
+            "You'll see how an agent can learn optimal behavior purely from trial and error, without ever being told the 'rules' of its environment."
+          ],
+          "bullets": [
+            "State-value and action-value functions",
+            "The Bellman equation",
+            "Q-learning update rule",
+            "On-policy vs. off-policy learning"
+          ]
+        },
+        {
+          "title": "Policy Gradient Methods",
+          "icon": "route",
+          "paragraphs": [
+            "Instead of learning values and deriving a policy, this unit covers methods that learn a policy directly — a mapping from state to action — which scales better to continuous action spaces like robot joints.",
+            "We'll cover the core policy gradient theorem intuitively and connect it to modern algorithms used in practice."
+          ],
+          "bullets": [
+            "Policies as direct state-to-action mappings",
+            "The policy gradient theorem, intuitively",
+            "REINFORCE algorithm basics",
+            "Why policy methods suit continuous action spaces"
+          ]
+        },
+        {
+          "title": "Exploration vs. Exploitation",
+          "icon": "compass",
+          "paragraphs": [
+            "An agent that only exploits what it already knows can get stuck in a mediocre strategy. This unit covers the core tension in RL — when to try something new versus stick with what's working.",
+            "We'll cover practical strategies like epsilon-greedy and upper-confidence-bound approaches that balance this trade-off."
+          ],
+          "bullets": [
+            "The exploration-exploitation trade-off",
+            "Epsilon-greedy strategies",
+            "Upper confidence bound (UCB) approaches",
+            "Reward shaping pitfalls"
+          ]
+        },
+        {
+          "title": "Deep RL & Capstone Project",
+          "icon": "robot",
+          "paragraphs": [
+            "Combining neural networks with RL unlocked agents that can play Atari games and control robots directly from raw pixels. This closing unit introduces Deep Q-Networks and modern actor-critic methods at a high level.",
+            "You'll finish by designing a simple RL environment and choosing an appropriate algorithm to train an agent within it."
+          ],
+          "bullets": [
+            "Deep Q-Networks (DQN) overview",
+            "Actor-critic methods at a glance",
+            "Real-world RL: robotics, games, recommendations",
+            "Capstone: design your own RL environment"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml2",
+      "type": "content",
+      "overview": "The right features often matter more than the choice of algorithm. This course covers how to turn raw, messy data into inputs that actually help a model learn — one of the most practical and undervalued skills in machine learning.",
+      "topics": [
+        "Handling missing and messy data",
+        "Encoding categorical variables",
+        "Scaling and transforming numeric features",
+        "Feature selection techniques",
+        "Building reusable feature pipelines"
+      ],
+      "units": [
+        {
+          "title": "Cleaning & Handling Missing Data",
+          "icon": "broom",
+          "paragraphs": [
+            "Real datasets are rarely complete. This unit covers strategies for handling missing values — from simple imputation to more thoughtful approaches that avoid quietly corrupting your model.",
+            "We'll also look at outlier detection and why a single bad row can meaningfully distort a trained model."
+          ],
+          "bullets": [
+            "Types of missingness (random vs. systematic)",
+            "Imputation strategies: mean, median, model-based",
+            "Outlier detection basics",
+            "When to drop vs. impute"
+          ]
+        },
+        {
+          "title": "Encoding Categorical Variables",
+          "icon": "list-check",
+          "paragraphs": [
+            "Models need numbers, not labels. This unit covers the main approaches to turning categories like 'city' or 'product type' into something a model can use — and the trade-offs each approach carries.",
+            "We'll pay particular attention to high-cardinality categories, where naive encoding can quietly blow up your feature space."
+          ],
+          "bullets": [
+            "One-hot vs. label encoding",
+            "Target and frequency encoding",
+            "Handling high-cardinality categories",
+            "Encoding pitfalls that leak information"
+          ]
+        },
+        {
+          "title": "Scaling & Transforming Numeric Features",
+          "icon": "ruler-combined",
+          "paragraphs": [
+            "Many models are sensitive to the scale of their inputs. This unit covers normalization, standardization, and transformations like log-scaling that make skewed data easier for a model to learn from.",
+            "We'll also touch on binning and polynomial features as ways to expose nonlinear patterns to linear models."
+          ],
+          "bullets": [
+            "Min-max scaling vs. standardization",
+            "Log and power transforms for skewed data",
+            "Binning continuous variables",
+            "Polynomial and interaction features"
+          ]
+        },
+        {
+          "title": "Feature Selection & Dimensionality",
+          "icon": "filter",
+          "paragraphs": [
+            "More features isn't always better — irrelevant or redundant features can hurt both accuracy and training time. This unit covers how to identify which features are actually pulling their weight.",
+            "We'll cover filter, wrapper, and embedded selection methods, plus a brief look at dimensionality reduction with PCA."
+          ],
+          "bullets": [
+            "Filter methods: correlation, chi-square",
+            "Wrapper methods: recursive feature elimination",
+            "Embedded methods: feature importance from trees",
+            "PCA for dimensionality reduction"
+          ]
+        },
+        {
+          "title": "Building Reusable Feature Pipelines",
+          "icon": "gears",
+          "paragraphs": [
+            "Feature engineering done ad hoc in a notebook rarely survives contact with production. This closing unit covers how to structure feature transformations into reusable, testable pipelines.",
+            "You'll finish by building a small end-to-end pipeline that takes raw data in and produces model-ready features out."
+          ],
+          "bullets": [
+            "Why pipelines beat ad hoc notebook code",
+            "Avoiding train/test leakage in pipelines",
+            "Versioning features for reproducibility",
+            "Capstone: an end-to-end feature pipeline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml3",
+      "type": "content",
+      "overview": "This course is a hands-on tour of building, training, and tuning neural networks with TensorFlow and Keras — from your first dense network to convolutional and sequence models.",
+      "topics": [
+        "TensorFlow & Keras fundamentals",
+        "Building and training neural networks",
+        "Convolutional neural networks",
+        "Sequence models with RNNs/LSTMs",
+        "Model tuning and deployment basics"
+      ],
+      "units": [
+        {
+          "title": "TensorFlow & Keras Fundamentals",
+          "icon": "cube",
+          "paragraphs": [
+            "This unit gets you oriented in the TensorFlow ecosystem — tensors, computational graphs, and the Keras API that most practitioners use day to day.",
+            "By the end, you'll be comfortable building, compiling, and training a basic neural network without needing to think about the underlying math at every step."
+          ],
+          "bullets": [
+            "Tensors and computational graphs",
+            "The Keras Sequential and Functional APIs",
+            "Compiling: loss, optimizer, metrics",
+            "Your first trained model"
+          ]
+        },
+        {
+          "title": "Building & Training Neural Networks",
+          "icon": "brain",
+          "paragraphs": [
+            "This unit goes deeper into what actually happens during training — forward passes, backpropagation, and gradient descent — and how to read training curves to diagnose problems.",
+            "We'll cover common issues like overfitting and vanishing gradients, and the everyday tools (dropout, batch norm, early stopping) used to fix them."
+          ],
+          "bullets": [
+            "Forward pass, backprop, gradient descent",
+            "Reading loss and accuracy curves",
+            "Overfitting: dropout, regularization, early stopping",
+            "Batch normalization basics"
+          ]
+        },
+        {
+          "title": "Convolutional Neural Networks in TensorFlow",
+          "icon": "image",
+          "paragraphs": [
+            "This unit applies the CNN concepts to real TensorFlow code — building an image classifier layer by layer, and understanding what each layer contributes to the final result.",
+            "We'll also cover transfer learning, which lets you get strong results on a small dataset by building on a model pretrained on a much larger one."
+          ],
+          "bullets": [
+            "Conv2D, pooling, and flattening layers in Keras",
+            "Building an image classifier end to end",
+            "Transfer learning with pretrained models",
+            "Data augmentation for small datasets"
+          ]
+        },
+        {
+          "title": "Sequence Models: RNNs & LSTMs",
+          "icon": "arrow-right-arrow-left",
+          "paragraphs": [
+            "Not all data is a fixed-size grid — text, time series, and audio all have order that matters. This unit covers recurrent networks and LSTMs, which are built to handle exactly that kind of sequential data.",
+            "You'll build a simple sequence model and see firsthand why vanilla RNNs struggle with long sequences, and how LSTMs address that."
+          ],
+          "bullets": [
+            "Why sequence data needs a different architecture",
+            "Vanilla RNNs and the vanishing gradient problem",
+            "LSTM and GRU cells at a glance",
+            "Building a simple sequence model in Keras"
+          ]
+        },
+        {
+          "title": "Tuning, Saving & Capstone Project",
+          "icon": "sliders",
+          "paragraphs": [
+            "A model isn't done when training stops — this unit covers hyperparameter tuning, saving and loading trained models, and the first steps toward serving a model in production.",
+            "You'll close out the course with a capstone: training and tuning a TensorFlow model on a dataset of your choice, start to finish."
+          ],
+          "bullets": [
+            "Hyperparameter tuning strategies",
+            "Saving, loading, and versioning models",
+            "A brief look at serving models in production",
+            "Capstone: train and tune your own model"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml4",
+      "type": "content",
+      "overview": "A model sitting in a notebook doesn't help anyone. This course covers what it actually takes to get a machine learning model into production — and keep it working reliably once it's there.",
+      "topics": [
+        "Packaging models for production",
+        "Serving models via APIs",
+        "Monitoring model performance",
+        "CI/CD for machine learning",
+        "Handling model and data drift"
+      ],
+      "units": [
+        {
+          "title": "Packaging Models for Production",
+          "icon": "box-open",
+          "paragraphs": [
+            "Training a model is only step one — this unit covers how to package a trained model, and its dependencies, so it can run reliably outside the environment it was trained in.",
+            "We'll look at serialization formats and containerization basics that make a model portable across machines."
+          ],
+          "bullets": [
+            "Model serialization: pickle, ONNX, SavedModel",
+            "Environment and dependency management",
+            "Containerizing a model with Docker basics",
+            "Versioning models alongside code"
+          ]
+        },
+        {
+          "title": "Serving Models via APIs",
+          "icon": "server",
+          "paragraphs": [
+            "Most production models are consumed through an API. This unit covers wrapping a trained model in a lightweight web service so other applications can request predictions on demand.",
+            "We'll also cover batch vs. real-time serving, and when each approach makes sense."
+          ],
+          "bullets": [
+            "Wrapping a model in a REST API",
+            "Real-time vs. batch inference",
+            "Latency and throughput considerations",
+            "Basic API authentication and rate limiting"
+          ]
+        },
+        {
+          "title": "Monitoring Model Performance",
+          "icon": "chart-line",
+          "paragraphs": [
+            "A model that worked at launch can quietly get worse over time. This unit covers what to monitor once a model is live — from raw uptime to more subtle accuracy degradation.",
+            "We'll cover setting up alerts so a struggling model gets flagged before it causes real damage."
+          ],
+          "bullets": [
+            "Logging predictions and inputs safely",
+            "Tracking accuracy and business metrics over time",
+            "Setting up alerting thresholds",
+            "Dashboards for model health"
+          ]
+        },
+        {
+          "title": "CI/CD for Machine Learning",
+          "icon": "code-branch",
+          "paragraphs": [
+            "Software teams automate testing and deployment — ML teams need the same discipline, adapted for models and data. This unit covers what a CI/CD pipeline looks like when a 'build' includes retraining a model.",
+            "We'll cover automated testing for models specifically, which looks different from testing plain application code."
+          ],
+          "bullets": [
+            "What changes when 'code' includes trained models",
+            "Automated testing for ML pipelines",
+            "Continuous training and retraining triggers",
+            "Rollback strategies for bad model deployments"
+          ]
+        },
+        {
+          "title": "Handling Drift & Capstone Project",
+          "icon": "arrows-rotate",
+          "paragraphs": [
+            "The world changes after a model is deployed, and that shows up as data drift or concept drift — the same inputs stop meaning the same thing. This closing unit covers how to detect and respond to that.",
+            "You'll finish with a capstone: designing a full deployment plan for a model, from packaging through monitoring."
+          ],
+          "bullets": [
+            "Data drift vs. concept drift",
+            "Detecting drift with statistical tests",
+            "Retraining triggers and strategies",
+            "Capstone: a full deployment plan for a model"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai1",
+      "type": "video",
+      "videoSrc": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      "overview": "A friendly, no-prerequisites tour of what artificial intelligence actually is, how it differs from ordinary software, and where you'll see it show up in everyday life.",
+      "topics": [
+        "What makes a system \"intelligent\"",
+        "AI vs. machine learning vs. deep learning",
+        "Common real-world applications",
+        "A brief history of AI's key milestones",
+        "What to learn next"
+      ]
+    },
+    {
+      "id": "ai5",
+      "type": "video",
+      "videoSrc": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      "overview": "An accessible walkthrough of how modern generative models create text, images, and other content — covering the core ideas behind large language models and diffusion-based image generators without assuming a deep math background.",
+      "topics": [
+        "How language models predict and generate text",
+        "Diffusion models for image generation",
+        "Prompting and controlling generative output",
+        "Common failure modes: hallucination and bias",
+        "Responsible use of generative tools"
+      ]
+    },
+    {
+      "id": "ml1",
+      "type": "video",
+      "videoSrc": "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+      "overview": "The essential building blocks of machine learning — what a model actually is, how it learns from data, and the everyday vocabulary (training, validation, overfitting) you'll need for every course after this one.",
+      "topics": [
+        "Supervised vs. unsupervised learning",
+        "Training, validation, and test sets",
+        "What \"learning from data\" actually means",
+        "Overfitting and underfitting",
+        "Choosing the right kind of model for a problem"
+      ]
+    }
+  ]
+}

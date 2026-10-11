@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import NotFound from "./pages/NotFound.jsx";
+import Notifications from "./pages/Notifications.jsx";
 import AddCourseEditGate from "./pages/AddCourseEditGate.jsx";
-import AddCourseGate from "./pages/AddCourseGate.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import Certificate from "./pages/Certificate.jsx";
@@ -45,8 +45,10 @@ function App() {
             <Route path="/index.html" element={<Home />} />
             <Route path="/login-choice" element={<LoginChoice />} />
             <Route path="/login-choice.html" element={<LoginChoice />} />
-            <Route path="/notification" element={<AddCourseForm />} />
-            <Route path="/notification.html" element={<AddCourseForm />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/notifications.html" element={<Notifications />} />
+            <Route path="/notification" element={<Notifications />} />
+            <Route path="/notification.html" element={<Notifications />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/reset-password.html" element={<ResetPassword />} />
             <Route path="/stu-dashboard" element={<StudentDashboard />} />
