@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
 import useRequireAdmin from "../hooks/useRequireAdmin";
 import { useCourses } from "../context/CourseContext";
-import { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
 
 const EMPTY = {
     title: "",

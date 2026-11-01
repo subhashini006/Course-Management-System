@@ -1,4 +1,4 @@
-const moduleModel = require("../models/moduleModel");
+const CourseModule = require("../models/CourseModule");
 const { str } = require("../utils/helpers");
 
 // What a student sees on the learning page: either a multi-unit "content"
@@ -54,17 +54,17 @@ function genericUnits() {
     ];
 }
 
-// Courses with hand-written content come from db.json "modules". Courses an
-// admin adds later get a sensible generic module built from their own details.
-function getModule(course) {
-    const stored = moduleModel.findById(course.id);
+// Pure function: the module for one course, given the stored document (or null).
+// Courses with hand-written content come from the "modules" collection; courses
+// an admin adds later get a sensible generic module built from their own details.
+function buildModule(course, stored) {
     if (stored) {
-        const { id, ...rest } = stored; // eslint-disable-line no-unused-vars
+        const { _id, course: _course, createdAt, updatedAt, __v, ...rest } = stored; // eslint-disable-line no-unused-vars
         return rest;
     }
     return {
         type: "content",
-        overview: course.outcome || "A course overview will be added here soon.",
+        overview: course.outcome || course.description || "A course overview will be added here soon.",
         topics: str(course.topics)
             .split(",")
             .map((t) => t.trim())
@@ -73,18 +73,39 @@ function getModule(course) {
     };
 }
 
-// Works out percentage complete from the saved progress and the course content
-function computeProgress(mod, progress) {
-    const saved = progress || {};
+// `course` is a plain (lean) course object
+async function getModule(course) {
+    const stored = await CourseModule.findOne({ course: course._id }).lean();
+    return buildModule(course, stored);
+}
+
+// One query for many courses -> Map(courseId string -> module)
+async function getModulesFor(courses) {
+    const stored = await CourseModule.find({ course: { $in: courses.map((c) => c._id) } }).lean();
+    const byCourse = new Map(stored.map((m) => [String(m.course), m]));
+    return new Map(courses.map((c) => [String(c._id), buildModule(c, byCourse.get(String(c._id)))]));
+}
+
+// Number of things a student can tick off in this module
+const countLessons = (mod) => (mod.type === "video" ? 1 : Array.isArray(mod.units) ? mod.units.length : 0);
+
+// Works out percentage complete from the saved flags and the course content
+function computeProgress(mod, saved = {}) {
     if (mod.type === "video") {
         const video = saved.video === true;
-        return { units: [], video, percent: video ? 100 : 0 };
+        return { units: [], video, completedLessons: video ? 1 : 0, totalLessons: 1, percent: video ? 100 : 0 };
     }
-    const total = Array.isArray(mod.units) ? mod.units.length : 0;
+    const total = countLessons(mod);
     const savedUnits = Array.isArray(saved.units) ? saved.units : [];
     const units = Array.from({ length: total }, (_, i) => savedUnits[i] === true);
     const done = units.filter(Boolean).length;
-    return { units, video: false, percent: total > 0 ? Math.round((done / total) * 100) : 0 };
+    return {
+        units,
+        video: false,
+        completedLessons: done,
+        totalLessons: total,
+        percent: total > 0 ? Math.round((done / total) * 100) : 0,
+    };
 }
 
-module.exports = { getModule, computeProgress };
+module.exports = { buildModule, getModule, getModulesFor, computeProgress, countLessons };

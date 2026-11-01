@@ -15,23 +15,22 @@ function slugify(text, fallback = "course") {
     );
 }
 
-// Adds -2, -3 ... until the id is not in `existing` (a Set)
-function uniqueId(base, existing) {
-    if (!existing.has(base)) return base;
-    let n = 2;
-    while (existing.has(`${base}-${n}`)) n += 1;
-    return `${base}-${n}`;
-}
-
 function sha256(value) {
     return crypto.createHash("sha256").update(value).digest("hex");
 }
 
-// Constant-time string comparison
-function safeEqual(a, b) {
-    const x = Buffer.from(String(a));
-    const y = Buffer.from(String(b));
-    return x.length === y.length && crypto.timingSafeEqual(x, y);
+// Escape user text before it goes into a RegExp
+const escapeRegex = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// Read ?page= and ?limit= safely. Both are capped so nobody can ask for
+// the whole collection (or a negative page) in one request.
+function parsePagination(query, { defaultLimit = 20, maxLimit = 100 } = {}) {
+    const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
+    const limit = Math.min(maxLimit, Math.max(1, Number.parseInt(query.limit, 10) || defaultLimit));
+    return { page, limit, skip: (page - 1) * limit };
 }
 
-module.exports = { str, slugify, uniqueId, sha256, safeEqual };
+// Lean documents (plain objects) have no `id` virtual, so add it by hand
+const withId = (doc) => (doc ? { ...doc, id: String(doc._id) } : doc);
+
+module.exports = { str, slugify, sha256, escapeRegex, parsePagination, withId };

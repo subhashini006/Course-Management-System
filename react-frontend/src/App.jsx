@@ -4,6 +4,7 @@ import Notifications from "./pages/Notifications.jsx";
 import AddCourseEditGate from "./pages/AddCourseEditGate.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
+import Chat from "./pages/Chat.jsx";
 import Certificate from "./pages/Certificate.jsx";
 import Course from "./pages/Course.jsx";
 import Courses from "./pages/Courses.jsx";
@@ -31,6 +32,7 @@ function App() {
             <Route path="/admin-login.html" element={<AdminLogin />} />
             <Route path="/certificate" element={<Certificate />} />
             <Route path="/certificate.html" element={<Certificate />} />
+            <Route path="/chat" element={<Chat />} />
             <Route path="/course" element={<Course />} />
             <Route path="/course.html" element={<Course />} />
             <Route path="/courses" element={<Courses />} />

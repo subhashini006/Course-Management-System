@@ -4,7 +4,7 @@ import PageMeta from "../components/PageMeta";
 import Footer from "../components/Footer";
 import { useCourses } from "../context/CourseContext";
 import { useAuth } from "../context/AuthContext";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 const SECTION_META = {
     ai: { label: "Artificial Intelligence", tag: "AI", icon: "fa-robot" },
@@ -109,7 +109,7 @@ export default function Courses() {
         setFormError("");
         setBusy(true);
         try {
-            await api.post("/api/v1/enrollments", { courseId: enrolling.id, name: student.name, roll: roll.trim() });
+            await api.post("/enrollments", { courseId: enrolling.id, name: student.name, roll: roll.trim() });
             setStartLink(`/course?course=${encodeURIComponent(enrolling.id)}`);
             setStep("success");
         } catch (err) {
@@ -145,6 +145,11 @@ export default function Courses() {
                     <li id="notifNavItem">
                         {student ? <Link to="/stu-dashboard">Student Dashboard</Link> : <Link to="/notifications">Notifications</Link>}
                     </li>
+                    {student && (
+                        <li>
+                            <Link to="/chat">Chat</Link>
+                        </li>
+                    )}
                     <li>
                         <a href="about.html">About</a>
                     </li>

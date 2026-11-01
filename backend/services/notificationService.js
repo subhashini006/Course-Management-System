@@ -1,82 +1,37 @@
-const courseModel = require("../models/courseModel");
-const studentModel = require("../models/studentModel");
-const { getStudentEnrollments } = require("./enrollmentService");
+const Notification = require("../models/Notification");
+const User = require("../models/User");
+const { getIO } = require("../config/socket"); // the socket server, once started
 
-// Notifications are built on the fly from real data, per student
-const buildNotifications = (student) => {
-    const enrollments = getStudentEnrollments(student.id);
-    const items = [];
+// Saves a notification in MongoDB and, if the recipient is online, pushes it
+// to them instantly over Socket.IO ("new_notification"). A failure to push
+// never breaks the request that triggered it — the notification is saved anyway.
+async function notify(recipientId, { title = "", message, type = "system", icon = "bell", link = "" }) {
+    const notification = await Notification.create({ recipient: recipientId, title, message, type, icon, link });
+    pushToUser(recipientId, "new_notification", notification.toJSON());
+    return notification;
+}
 
-    items.push({
-        id: "welcome",
-        type: "course",
-        icon: "hand-sparkles",
-        title: "Welcome to StudyVerse!",
-        message: "Browse the course catalog and enroll to start tracking your learning journey here.",
-        date: enrollments.length ? enrollments[0].date : null,
-        link: "/courses",
-    });
+// One notification for every student (e.g. "New course added")
+async function notifyAllStudents(payload) {
+    const students = await User.find({ role: "student" }).select("_id").lean();
+    if (!students.length) return 0;
+    const docs = await Notification.insertMany(
+        students.map((s) => ({ recipient: s._id, ...payload })),
+        { ordered: false }
+    );
+    docs.forEach((doc) => pushToUser(doc.recipient, "new_notification", doc.toJSON()));
+    return docs.length;
+}
 
-    courseModel
-        .filter((c) => c.createdAt)
-        .forEach((c) => {
-            items.push({
-                id: `course-${c.id}`,
-                type: "course",
-                icon: "circle-plus",
-                title: `New Course Added: ${c.title}`,
-                message:
-                    `A new ${c.level || ""} course in ${c.sectionLabel || c.section || "Other"}` +
-                    (c.instructor ? ` — taught by ${c.instructor}` : "") +
-                    ".",
-                date: c.createdAt,
-                link: "/courses",
-            });
-        });
+function pushToUser(userId, event, payload) {
+    const io = getIO();
+    if (io) io.to(`user:${userId}`).emit(event, payload);
+}
 
-    enrollments.forEach((en) => {
-        items.push({
-            id: `enroll-${en.courseId}`,
-            type: "enrollment",
-            icon: "graduation-cap",
-            title: `Enrolled in ${en.courseName}`,
-            message: "You successfully enrolled in this course. Jump back in whenever you're ready.",
-            date: en.date,
-            link: "/courses",
-        });
-        if (en.status === "completed") {
-            items.push({
-                id: `complete-${en.courseId}`,
-                type: "certificate",
-                icon: "trophy",
-                title: `Course Completed: ${en.courseName}`,
-                message: "Great work! Your certificate is ready to view and download.",
-                date: en.completedDate || en.date,
-                link: `/certificate?course=${encodeURIComponent(en.courseId)}`,
-            });
-        }
-    });
+// Fire-and-forget wrapper: notification problems are logged, not thrown
+const safeNotify = (...args) =>
+    notify(...args).catch((error) => console.error("Could not create notification:", error.message));
+const safeNotifyAll = (...args) =>
+    notifyAllStudents(...args).catch((error) => console.error("Could not create notifications:", error.message));
 
-    // Newest first; items with no date count as "just now"
-    const time = (i) => (i.date ? new Date(i.date).getTime() : Date.now());
-    items.sort((a, b) => time(b) - time(a));
-
-    const read = new Set(student.notificationsRead || []);
-    return items.map((i) => ({ ...i, read: read.has(i.id) }));
-};
-
-const getNotifications = (studentId) => {
-    const items = buildNotifications(studentModel.findById(studentId));
-    return { items, unreadCount: items.filter((i) => !i.read).length };
-};
-
-// ids: ["welcome", ...]  or  all: true
-const markRead = (studentId, { ids, all }) => {
-    const student = studentModel.findById(studentId);
-    const read = new Set(student.notificationsRead || []);
-    if (all === true) buildNotifications(student).forEach((n) => read.add(n.id));
-    else if (Array.isArray(ids)) ids.forEach((id) => read.add(String(id)));
-    studentModel.update(studentId, { notificationsRead: [...read] });
-};
-
-module.exports = { getNotifications, markRead };
+module.exports = { notify, notifyAllStudents, safeNotify, safeNotifyAll, pushToUser };

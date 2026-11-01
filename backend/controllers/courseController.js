@@ -1,77 +1,37 @@
-const {
-    getAllCourses,
-    getCourseById,
-    getCourseModule,
-    createCourse,
-    updateCourse,
-    deleteCourse,
-} = require("../services/courseService");
+const courseService = require("../services/courseService");
 
 // GET /api/v1/courses
-const getCourses = (req, res) => {
-    const courses = getAllCourses();
-
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses,
-    });
-};
+async function getAllCourses(req, res) {
+    const { courses, pagination } = await courseService.listCourses(req.query);
+    res.status(200).json({ success: true, count: courses.length, pagination, data: courses });
+}
 
 // GET /api/v1/courses/:id
-const getCourse = (req, res) => {
-    res.status(200).json({
-        success: true,
-        data: getCourseById(req.params.id),
-    });
-};
+async function getCourseById(req, res) {
+    res.status(200).json({ success: true, data: await courseService.getCourseById(req.params.id) });
+}
 
 // GET /api/v1/courses/:id/module
-const getModule = (req, res) => {
-    res.status(200).json({
-        success: true,
-        data: getCourseModule(req.params.id),
-    });
-};
+async function getCourseModule(req, res) {
+    res.status(200).json({ success: true, data: await courseService.getCourseModule(req.params.id) });
+}
 
 // POST /api/v1/courses
-const addCourse = (req, res) => {
-    const newCourse = createCourse(req.body);
-
-    res.status(201).json({
-        success: true,
-        message: "Course created successfully",
-        data: newCourse,
-    });
-};
+async function createCourse(req, res) {
+    const course = await courseService.createCourse(req.body);
+    res.status(201).json({ success: true, message: "Course created successfully", data: course });
+}
 
 // PUT /api/v1/courses/:id
-const editCourse = (req, res) => {
-    const updatedCourse = updateCourse(req.params.id, req.body);
-
-    res.status(200).json({
-        success: true,
-        message: "Course updated successfully",
-        data: updatedCourse,
-    });
-};
+async function updateCourse(req, res) {
+    const course = await courseService.updateCourse(req.params.id, req.body);
+    res.status(200).json({ success: true, message: "Course updated successfully", data: course });
+}
 
 // DELETE /api/v1/courses/:id
-const removeCourse = (req, res) => {
-    const result = deleteCourse(req.params.id);
+async function deleteCourse(req, res) {
+    const result = await courseService.deleteCourse(req.params.id);
+    res.status(200).json({ success: true, message: "Course deleted successfully", data: result });
+}
 
-    res.status(200).json({
-        success: true,
-        message: "Course deleted successfully",
-        data: result,
-    });
-};
-
-module.exports = {
-    getCourses,
-    getCourse,
-    getModule,
-    addCourse,
-    editCourse,
-    removeCourse,
-};
+module.exports = { getAllCourses, getCourseById, getCourseModule, createCourse, updateCourse, deleteCourse };

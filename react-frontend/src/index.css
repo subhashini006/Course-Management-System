@@ -9,3 +9,38 @@ body,
     padding: 0;
     min-height: 100%;
 }
+
+/* ---------- Task 13: live notification badge + chat ---------- */
+.nav-badge {
+    display: inline-block;
+    min-width: 18px;
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+}
+.chat-status { font-size: 13px; color: var(--text-muted, #6b7280); }
+.chat-status i { font-size: 8px; margin-right: 4px; color: #f59e0b; }
+.chat-status--on i { color: #10b981; }
+.chat-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; min-height: 420px; }
+.chat-contacts { display: flex; flex-direction: column; gap: 6px; max-height: 480px; overflow-y: auto; border-right: 1px solid rgba(124, 58, 237, 0.15); padding-right: 12px; }
+.chat-contact { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 12px; border: 1px solid transparent; border-radius: 10px; background: transparent; cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.chat-contact:hover { background: rgba(124, 58, 237, 0.07); }
+.chat-contact--active { background: rgba(124, 58, 237, 0.12); border-color: rgba(124, 58, 237, 0.35); }
+.chat-contact-name { flex: 1; font-weight: 600; }
+.chat-contact-role { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted, #6b7280); }
+.chat-panel { display: flex; flex-direction: column; min-width: 0; }
+.chat-panel-head { font-weight: 700; padding-bottom: 10px; border-bottom: 1px solid rgba(124, 58, 237, 0.15); }
+.chat-messages { flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 0; overflow-y: auto; max-height: 360px; }
+.chat-bubble { align-self: flex-start; max-width: 75%; padding: 8px 12px; border-radius: 14px 14px 14px 4px; background: rgba(20, 184, 166, 0.12); word-break: break-word; display: flex; flex-direction: column; gap: 2px; }
+.chat-bubble--mine { align-self: flex-end; border-radius: 14px 14px 4px 14px; background: rgba(124, 58, 237, 0.16); }
+.chat-bubble small { font-size: 10.5px; color: var(--text-muted, #6b7280); align-self: flex-end; }
+.chat-form { display: flex; gap: 10px; padding-top: 10px; }
+.chat-form input { flex: 1; padding: 10px 14px; border-radius: 10px; border: 1px solid rgba(124, 58, 237, 0.25); font: inherit; }
+.chat-empty { color: var(--text-muted, #6b7280); padding: 12px 0; }
+@media (max-width: 700px) { .chat-layout { grid-template-columns: 1fr; } .chat-contacts { border-right: 0; max-height: 160px; } }

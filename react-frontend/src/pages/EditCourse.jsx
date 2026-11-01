@@ -4,7 +4,7 @@ import PageMeta from "../components/PageMeta";
 import Footer from "../components/Footer";
 import useRequireAdmin from "../hooks/useRequireAdmin";
 import { useCourses } from "../context/CourseContext";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 const DEFAULT_SECTIONS = [
     { value: "ai", label: "Artificial Intelligence" },
@@ -31,7 +31,7 @@ export default function EditCourse() {
         if (!ready) return undefined;
         if (!courseId) return undefined;
         let cancelled = false;
-        api.get(`/api/v1/courses/${encodeURIComponent(courseId)}`)
+        api.get(`/courses/${encodeURIComponent(courseId)}`)
             .then(({ data: res }) => {
                 if (cancelled) return;
                 const c = res.data;

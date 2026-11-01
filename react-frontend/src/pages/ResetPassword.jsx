@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
-import api, { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
+import { resetPassword } from "../api/authApi";
 
 export default function ResetPassword() {
     const [params] = useSearchParams();
@@ -15,13 +16,17 @@ export default function ResetPassword() {
     async function handleSubmit(e) {
         e.preventDefault();
         setError("");
+        if (password.length < 12 || password.length > 72) {
+            setError("Password must be between 12 and 72 characters.");
+            return;
+        }
         if (password !== confirm) {
             setError("Passwords do not match.");
             return;
         }
         setBusy(true);
         try {
-            await api.post("/api/v1/auth/reset-password", { token, password });
+            await resetPassword(token, password);
             setDone(true);
         } catch (err) {
             setError(errorMessage(err));

@@ -1,10 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useSocket } from "../context/SocketContext";
 
 // The navbar shared by every logged-in student page.
 export default function StudentNav({ active }) {
     const { logout } = useAuth();
     const navigate = useNavigate();
+    const { unreadNotifications } = useSocket();
 
     async function handleLogout(e) {
         e.preventDefault();
@@ -28,6 +30,12 @@ export default function StudentNav({ active }) {
                 <li>
                     <Link to="/notifications" className={active === "notifications" ? "active-nav" : ""}>
                         Notifications
+                        {unreadNotifications > 0 && <span className="nav-badge">{unreadNotifications > 99 ? "99+" : unreadNotifications}</span>}
+                    </Link>
+                </li>
+                <li>
+                    <Link to="/chat" className={active === "chat" ? "active-nav" : ""}>
+                        Chat
                     </Link>
                 </li>
                 <li>

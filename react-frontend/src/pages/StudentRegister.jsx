@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
-import api, { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
+import { registerStudent } from "../api/authApi";
 
-const EMPTY = { username: "", name: "", email: "", department: "", password: "", confirm: "" };
+const EMPTY = { name: "", email: "", department: "", password: "", confirm: "" };
 
 export default function StudentRegister() {
     const navigate = useNavigate();
@@ -21,6 +22,10 @@ export default function StudentRegister() {
             setError("Please fill in all fields.");
             return;
         }
+        if (form.password.length < 12 || form.password.length > 72) {
+            setError("Password must be between 12 and 72 characters.");
+            return;
+        }
         if (form.password !== form.confirm) {
             setError("Passwords do not match.");
             return;
@@ -29,8 +34,8 @@ export default function StudentRegister() {
         setBusy(true);
         try {
             const { confirm, ...payload } = form; // eslint-disable-line no-unused-vars
-            await api.post("/api/v1/students", payload);
-            alert("Account created successfully! Please log in.");
+            const result = await registerStudent(payload);
+            alert(`${result.message}! Please log in.`);
             navigate("/stu-login");
         } catch (err) {
             setError(errorMessage(err, "Could not create your account."));
@@ -97,8 +102,6 @@ export default function StudentRegister() {
                                 </p>
                             )}
                             <form className="auth-form" onSubmit={handleSubmit}>
-                                <label htmlFor="studentUsername">Username</label>
-                                <input type="text" id="studentUsername" placeholder="johndoe23" value={form.username} onChange={set("username")} />
                                 <label htmlFor="studentName">Full Name</label>
                                 <input type="text" id="studentName" placeholder="John Doe" value={form.name} onChange={set("name")} />
                                 <label htmlFor="studentEmail">Email Address</label>
@@ -106,7 +109,7 @@ export default function StudentRegister() {
                                 <label htmlFor="studentDepartment">Department</label>
                                 <input type="text" id="studentDepartment" placeholder="e.g. Computer Science" value={form.department} onChange={set("department")} />
                                 <label htmlFor="studentPassword">Password</label>
-                                <input type="password" id="studentPassword" placeholder="••••••••" value={form.password} onChange={set("password")} />
+                                <input type="password" id="studentPassword" placeholder="12–72 characters" minLength={12} maxLength={72} value={form.password} onChange={set("password")} />
                                 <label htmlFor="studentConfirmPassword">Confirm Password</label>
                                 <input type="password" id="studentConfirmPassword" placeholder="••••••••" value={form.confirm} onChange={set("confirm")} />
                                 <button type="submit" className="auth-submit" disabled={busy}>

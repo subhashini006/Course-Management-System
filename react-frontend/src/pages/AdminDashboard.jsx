@@ -4,7 +4,7 @@ import PageMeta from "../components/PageMeta";
 import useRequireAdmin from "../hooks/useRequireAdmin";
 import { useAuth } from "../context/AuthContext";
 import { useCourses } from "../context/CourseContext";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 function LevelBadge({ level }) {
     const cls = level === "Beginner" ? "beg" : level === "Intermediate" ? "int" : "adv";
@@ -21,7 +21,7 @@ export default function AdminDashboard() {
 
     const loadEnrollments = useCallback(async () => {
         try {
-            const { data } = await api.get("/api/v1/enrollments");
+            const { data } = await api.get("/enrollments");
             setEnrollments(data.data);
         } catch (err) {
             setMessage(errorMessage(err));
@@ -54,7 +54,7 @@ export default function AdminDashboard() {
     async function handleClearEnrollments() {
         if (!confirm("Clear all enrollment data? This cannot be undone.")) return;
         try {
-            await api.delete("/api/v1/enrollments");
+            await api.delete("/enrollments");
             await loadEnrollments();
             setMessage("");
         } catch (err) {
@@ -93,6 +93,9 @@ export default function AdminDashboard() {
                     </li>
                     <li>
                         <Link to="/courses">View Courses Page</Link>
+                    </li>
+                    <li>
+                        <Link to="/chat">Chat</Link>
                     </li>
                 </ul>
                 <div className="nav-buttons">

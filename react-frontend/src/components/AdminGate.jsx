@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "./PageMeta";
 import { useAuth } from "../context/AuthContext";
-import { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
 
 // The "Verify Admin Access" screen. The email/password check now happens on
 // the backend; on success the backend sets an admin session cookie and we

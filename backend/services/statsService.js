@@ -1,13 +1,17 @@
-const { readDB } = require("../models/db");
+const User = require("../models/User");
+const Course = require("../models/Course");
+const Enrollment = require("../models/Enrollment");
+const CourseModule = require("../models/CourseModule");
 
-const getStats = () => {
-    const db = readDB();
-    const stats = {};
-    Object.keys(db).forEach((name) => {
-        stats[name] = db[name].length;
-    });
-    stats.completedEnrollments = db.enrollments.filter((e) => e.status === "completed").length;
-    return stats;
-};
+async function getStats() {
+    const [students, courses, enrollments, modules, completedEnrollments] = await Promise.all([
+        User.countDocuments({ role: "student" }),
+        Course.countDocuments(),
+        Enrollment.countDocuments({ status: { $ne: "withdrawn" } }),
+        CourseModule.countDocuments(),
+        Enrollment.countDocuments({ status: "completed" }),
+    ]);
+    return { students, courses, enrollments, modules, completedEnrollments };
+}
 
 module.exports = { getStats };

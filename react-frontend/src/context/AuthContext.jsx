@@ -1,25 +1,35 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import api from "../services/api";
+import { SESSION_EXPIRED_EVENT, clearToken, getToken, saveToken } from "../api/apiClient";
+import * as authApi from "../api/authApi";
 
 const AuthContext = createContext(null);
 
-// Who is logged in? The answer lives on the backend (an HttpOnly session
-// cookie), so nothing about the login is kept in localStorage any more.
-// This asks the backend once on load and exposes login / logout helpers.
+// Who is logged in? The login gives us a JWT, which is kept in sessionStorage
+// and attached to every request by the axios client. On load, if a token is
+// there, the backend is asked who it belongs to (GET /auth/me); an expired or
+// invalid token is dropped and the app shows the logged-out state.
 export function AuthProvider({ children }) {
     const [role, setRole] = useState(null); // "student" | "admin" | null
     const [student, setStudent] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null); // { id, name, email, role } for students AND admins
+    const [loading, setLoading] = useState(Boolean(getToken()));
+
+    const apply = (data) => {
+        setRole(data.role);
+        setStudent(data.student);
+        setUser(data.user || null);
+    };
 
     useEffect(() => {
+        if (!getToken()) return undefined;
+
         let cancelled = false;
-        api.get("/api/v1/auth/me")
-            .then(({ data }) => {
-                if (cancelled) return;
-                setRole(data.data.role);
-                setStudent(data.data.student);
+        authApi
+            .fetchCurrentUser()
+            .then((data) => {
+                if (!cancelled) apply(data);
             })
-            .catch(() => {})
+            .catch(() => clearToken())
             .finally(() => {
                 if (!cancelled) setLoading(false);
             });
@@ -28,33 +38,36 @@ export function AuthProvider({ children }) {
         };
     }, []);
 
-    const apply = (data) => {
-        setRole(data.role);
-        setStudent(data.student);
-    };
+    // A request came back 401 for our token (expired) -> become logged out
+    useEffect(() => {
+        const onExpired = () => apply({ role: null, student: null, user: null });
+        window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
+        return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
+    }, []);
 
     const loginStudent = useCallback(async (email, password) => {
-        const { data } = await api.post("/api/v1/auth/login", { email, password });
-        apply(data.data);
-        return data.data.student;
+        const result = await authApi.loginStudent({ email, password });
+        saveToken(result.token, result.role);
+        // /auth/login accepts any account, so trust the role the server reports
+        apply({ role: result.role, student: result.role === "student" ? result.student : null, user: result.student });
+        return result.student;
     }, []);
 
     const loginAdmin = useCallback(async (email, password) => {
-        const { data } = await api.post("/api/v1/auth/admin-login", { email, password });
-        apply(data.data);
+        const result = await authApi.loginAdmin({ email, password });
+        saveToken(result.token, "admin");
+        apply({ role: "admin", student: null, user: result.student });
     }, []);
 
+    // A JWT is stateless, so logging out just means forgetting the token.
     const logout = useCallback(async () => {
-        try {
-            await api.post("/api/v1/auth/logout");
-        } finally {
-            apply({ role: null, student: null });
-        }
+        clearToken();
+        apply({ role: null, student: null, user: null });
     }, []);
 
     const value = useMemo(
-        () => ({ role, student, isAdmin: role === "admin", loading, loginStudent, loginAdmin, logout }),
-        [role, student, loading, loginStudent, loginAdmin, logout]
+        () => ({ role, student, user, isAdmin: role === "admin", loading, loginStudent, loginAdmin, logout }),
+        [role, student, user, loading, loginStudent, loginAdmin, logout]
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

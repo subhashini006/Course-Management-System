@@ -235,19 +235,6 @@
       "image": "https://picsum.photos/seed/full-stack-web-development/400/220"
     }
   ],
-  "students": [
-    {
-      "id": 1,
-      "username": "demo",
-      "name": "Demo Student",
-      "email": "demo@studyverse.com",
-      "department": "Computer Science",
-      "passwordHash": "bdb93cc68e2b841715bd7d1f75ebb7e1:b7fe2e703378d435acee7ea2489bfd23f2e6cb31dad4e3ba34c23c17dba6079dda5285d1710f8597d9d6ad159b046b5fe6101c4470c5716ace5ab4fe76234fe6",
-      "notificationsRead": [],
-      "createdAt": "2026-10-10T08:09:31.556Z"
-    }
-  ],
-  "enrollments": [],
   "modules": [
     {
       "id": "ai2",

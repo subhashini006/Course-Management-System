@@ -4,7 +4,7 @@ import PageMeta from "../components/PageMeta";
 import StudentNav from "../components/StudentNav";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 function EmptyState({ icon, title, message, buttonText }) {
     return (
@@ -70,7 +70,7 @@ export default function StudentDashboard() {
             navigate("/stu-login");
             return;
         }
-        api.get("/api/v1/me/enrollments")
+        api.get("/me/enrollments")
             .then(({ data }) => setEnrollments(data.data))
             .catch((err) => setError(errorMessage(err)));
     }, [authLoading, student, navigate]);
@@ -80,7 +80,7 @@ export default function StudentDashboard() {
     }
 
     const list = enrollments || [];
-    const inProgress = list.filter((e) => e.status === "in-progress");
+    const inProgress = list.filter((e) => e.status === "active");
     const completed = list.filter((e) => e.status === "completed");
     const overallPct = list.length > 0 ? Math.round((completed.length / list.length) * 100) : 0;
 

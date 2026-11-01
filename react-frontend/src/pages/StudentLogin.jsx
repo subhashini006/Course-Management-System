@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
 import { useAuth } from "../context/AuthContext";
-import { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
 
 export default function StudentLogin() {
     const { loginStudent } = useAuth();

@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 export default function Course() {
     const [params] = useSearchParams();
@@ -25,8 +25,8 @@ export default function Course() {
         if (!courseId) return undefined;
         let cancelled = false;
 
-        const requests = [api.get(`/api/v1/courses/${encodeURIComponent(courseId)}`), api.get(`/api/v1/courses/${encodeURIComponent(courseId)}/module`)];
-        if (student) requests.push(api.get("/api/v1/me/enrollments"));
+        const requests = [api.get(`/courses/${encodeURIComponent(courseId)}`), api.get(`/courses/${encodeURIComponent(courseId)}/module`)];
+        if (student) requests.push(api.get("/me/enrollments"));
 
         Promise.all(requests)
             .then(([courseRes, moduleRes, enrollRes]) => {
@@ -54,7 +54,7 @@ export default function Course() {
         setSaving(true);
         setSaveError("");
         try {
-            const { data } = await api.patch(`/api/v1/enrollments/${enrollment.id}`, { progress });
+            const { data } = await api.patch(`/enrollments/${enrollment.id}`, { progress });
             setEnrollment(data.data);
         } catch (err) {
             setEnrollment(previous);

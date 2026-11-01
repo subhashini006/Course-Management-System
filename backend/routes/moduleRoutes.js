@@ -1,9 +1,11 @@
 const express = require("express");
-const { getModules, getStoredModule } = require("../controllers/moduleController");
-
 const router = express.Router();
 
-router.get("/", getModules);
-router.get("/:id", getStoredModule);
+const { getStoredModule } = require("../controllers/moduleController");
+const validateRequest = require("../middleware/validateRequest");
+const { mongoIdParam } = require("../validators/common");
+
+// Course content is public, like the course catalog itself
+router.get("/:id", mongoIdParam("id", "course ID"), validateRequest, getStoredModule);
 
 module.exports = router;

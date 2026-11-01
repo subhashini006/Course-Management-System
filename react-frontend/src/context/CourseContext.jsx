@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import api, { errorMessage } from "../services/api";
+import api, { errorMessage } from "../api/apiClient";
 
 const CourseContext = createContext(null);
 
@@ -12,7 +12,7 @@ export function CourseProvider({ children }) {
 
     const refresh = useCallback(async () => {
         try {
-            const response = await api.get("/api/v1/courses");
+            const response = await api.get("/courses");
             setCourses(response.data.data);
             setError(null);
         } catch (err) {
@@ -28,7 +28,7 @@ export function CourseProvider({ children }) {
     // is in response.data.data.
     const addCourse = useCallback(async (courseData) => {
         try {
-            const response = await api.post("/api/v1/courses", courseData);
+            const response = await api.post("/courses", courseData);
             const newCourse = response.data.data;
             setCourses((previousCourses) => [...(previousCourses || []), newCourse]);
             return newCourse;
@@ -40,7 +40,7 @@ export function CourseProvider({ children }) {
 
     const updateCourse = useCallback(async (id, courseData) => {
         try {
-            const response = await api.put(`/api/v1/courses/${encodeURIComponent(id)}`, courseData);
+            const response = await api.put(`/courses/${encodeURIComponent(id)}`, courseData);
             const updatedCourse = response.data.data;
             setCourses((previousCourses) =>
                 (previousCourses || []).map((course) => (course.id === id ? updatedCourse : course))
@@ -54,7 +54,7 @@ export function CourseProvider({ children }) {
 
     const deleteCourse = useCallback(async (id) => {
         try {
-            await api.delete(`/api/v1/courses/${encodeURIComponent(id)}`);
+            await api.delete(`/courses/${encodeURIComponent(id)}`);
             setCourses((previousCourses) => (previousCourses || []).filter((course) => course.id !== id));
         } catch (err) {
             console.error("Error deleting course:", err);

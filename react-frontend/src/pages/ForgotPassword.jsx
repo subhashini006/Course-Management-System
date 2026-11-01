@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import PageMeta from "../components/PageMeta";
-import api, { errorMessage } from "../services/api";
+import { errorMessage } from "../api/apiClient";
+import { forgotPassword } from "../api/authApi";
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export default function ForgotPassword() {
         setError("");
         setBusy(true);
         try {
-            const { data } = await api.post("/api/v1/auth/forgot-password", { email: email.trim() });
+            const data = await forgotPassword(email.trim());
             setResult({ message: data.message, resetLink: data.data && data.data.resetLink });
         } catch (err) {
             setError(errorMessage(err));

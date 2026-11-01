@@ -1,33 +1,21 @@
 const express = require("express");
-const {
-    getCourses,
-    getCourse,
-    getModule,
-    addCourse,
-    editCourse,
-    removeCourse,
-} = require("../controllers/courseController");
-const validateCourse = require("../middleware/courseValidation");
-const { requireAdmin } = require("../middleware/authMiddleware");
-
 const router = express.Router();
 
-// GET all courses
-router.get("/", getCourses);
+const courseController = require("../controllers/courseController");
+const authMiddleware = require("../middleware/authMiddleware");
+const authorizeRoles = require("../middleware/roleMiddleware");
+const validateRequest = require("../middleware/validateRequest");
+const { courseIdParam, createCourseValidation, updateCourseValidation } = require("../validators/courseValidators");
 
-// GET one course
-router.get("/:id", getCourse);
+// Access policy
+//   Public ........ GET  /api/v1/courses, /:id, /:id/module
+//   Admin only .... POST / PUT / DELETE  (401 without a token, 403 for a student)
+router.get("/", courseController.getAllCourses);
+router.get("/:id", courseIdParam, validateRequest, courseController.getCourseById);
+router.get("/:id/module", courseIdParam, validateRequest, courseController.getCourseModule);
 
-// GET the learning content of one course
-router.get("/:id/module", getModule);
-
-// CREATE course (admin)
-router.post("/", requireAdmin, validateCourse, addCourse);
-
-// UPDATE course (admin)
-router.put("/:id", requireAdmin, editCourse);
-
-// DELETE course (admin)
-router.delete("/:id", requireAdmin, removeCourse);
+router.post("/", authMiddleware, authorizeRoles("admin"), createCourseValidation, validateRequest, courseController.createCourse);
+router.put("/:id", authMiddleware, authorizeRoles("admin"), courseIdParam, updateCourseValidation, validateRequest, courseController.updateCourse);
+router.delete("/:id", authMiddleware, authorizeRoles("admin"), courseIdParam, validateRequest, courseController.deleteCourse);
 
 module.exports = router;

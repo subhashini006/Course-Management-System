@@ -4,7 +4,8 @@ import PageMeta from "../components/PageMeta";
 import StudentNav from "../components/StudentNav";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import api, { errorMessage } from "../services/api";
+import { useSocket } from "../context/SocketContext";
+import api, { errorMessage } from "../api/apiClient";
 
 function timeAgo(iso) {
     if (!iso) return "New";
@@ -41,20 +42,34 @@ function NotificationItem({ n, onOpen }) {
     );
 }
 
+// The API stores { _id, isRead, createdAt, ... }; the page works with { id, read, date }
+const toItem = (n) => ({
+    id: n.id || n._id,
+    type: n.type || "system",
+    icon: n.icon || "bell",
+    title: n.title || n.message,
+    message: n.message,
+    link: n.link || "",
+    read: Boolean(n.isRead),
+    date: n.createdAt,
+});
+
 export default function Notifications() {
     const { student, loading: authLoading } = useAuth();
+    const { socket, setUnreadNotifications } = useSocket();
     const navigate = useNavigate();
     const [items, setItems] = useState(null);
     const [error, setError] = useState("");
 
     const load = useCallback(async () => {
         try {
-            const { data } = await api.get("/api/v1/me/notifications");
-            setItems(data.data.items);
+            const { data } = await api.get("/notifications");
+            setItems(data.notifications.map(toItem));
+            setUnreadNotifications(data.unreadCount);
         } catch (err) {
             setError(errorMessage(err));
         }
-    }, []);
+    }, [setUnreadNotifications]);
 
     useEffect(() => {
         if (authLoading) return;
@@ -65,19 +80,30 @@ export default function Notifications() {
         load();
     }, [authLoading, student, navigate, load]);
 
+    // Task 13 — a notification pushed by the server appears at the top instantly
+    useEffect(() => {
+        if (!socket) return undefined;
+        const onNew = (n) => setItems((prev) => (prev && prev.some((x) => x.id === (n.id || n._id)) ? prev : [toItem(n), ...(prev || [])]));
+        socket.on("new_notification", onNew);
+        return () => socket.off("new_notification", onNew);
+    }, [socket]);
+
     async function openNotification(n) {
         try {
-            if (!n.read) await api.post("/api/v1/me/notifications/read", { ids: [n.id] });
+            if (!n.read) {
+                await api.patch(`/notifications/${n.id}/read`);
+                setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
+                setUnreadNotifications((c) => Math.max(0, c - 1));
+            }
         } catch (err) {
             setError(errorMessage(err));
         }
         if (n.link) navigate(n.link);
-        else load();
     }
 
     async function markAllRead() {
         try {
-            await api.post("/api/v1/me/notifications/read", { all: true });
+            await api.patch("/notifications/read-all");
             await load();
         } catch (err) {
             setError(errorMessage(err));

@@ -1,229 +1,185 @@
-# 🎓 StudyVerse — Course Management System
+# StudyVerse — Student Course Management System
 
-A full student course management platform, built first as a static HTML/CSS/JS site and then converted into a modern **React (Vite)** application, backed by a real **Express + Node backend**. Students can browse courses, enroll, track progress, and earn certificates; admins can add/edit courses and manage enrollments.
+A full-stack course platform: students register, browse courses, enrol, track
+their learning progress, chat and receive live notifications; an admin manages
+courses and students.
 
-## 📌 Overview
+| Layer | Technology |
+|---|---|
+| Frontend | React 19, React Router, Axios, Vite, Socket.IO client |
+| Backend | Node.js, Express 5, Mongoose (MongoDB), Socket.IO |
+| Security | JWT (Bearer), bcrypt, role-based access, helmet, CORS allow-list, express-validator, rate limiting |
+| Database | MongoDB (local or MongoDB Atlas) |
 
-StudyVerse streamlines course discovery and learning for students while giving admins simple tools to manage course content. The project exists in four parts in this repo — the **original static frontend**, its **React conversion**, the **old json-server mock API** (`mockapi/`, no longer used), and the **Express backend** (`backend/`) that now stores all the data — so the full evolution of the project is visible in one place.
-
-## ✨ Features
-
-- Student registration & login
-- Admin login with course management access
-- Browse courses by category (Artificial Intelligence / Machine Learning)
-- Expandable course details — instructor, topics, duration, outcomes
-- Course enrollment flow with confirmation + auto-redirect
-- Per-course learning content with progress tracking (units/video completion)
-- Student dashboard — enrolled courses & progress at a glance
-- Certificate generation on course completion
-- Admin dashboard — add/edit courses, view & reset enrollments
-- Forgot / reset password flow
-- Fully responsive, mobile-friendly layout
-- All data (courses, students, enrollments, progress, notifications, login sessions) stored by the backend in `backend/data/db.json` — nothing is kept in `localStorage`
-
-## 🛠️ Tech Stack
-
-### Original Frontend
-- HTML5, CSS3, JavaScript (vanilla)
-
-### React Conversion
-- React 19
-- React Router
-- Vite
-
-### Backend
-- Node.js + Express
-- `cors`, `dotenv`, `morgan` (request logging), `nodemon` (dev auto-restart)
-- Layered architecture: routes → controllers → services → models
-- JSON file storage (`backend/data/db.json`) via Node's `fs`
-- scrypt password hashing and signed HttpOnly session cookies (Node built-ins)
-
-### Frontend ↔ backend
-- axios (`src/services/api.js`), React Context (`CourseContext`, `AuthContext`)
-
-### Tools
-- Visual Studio Code
-- Git & GitHub
-
-## 📂 Project Structure
+This project covers **Tasks 9 – 15**: MongoDB data model and student/auth APIs,
+JWT login and roles, the course/enrollment/progress collections, real-time chat
+and notifications, security hardening, testing and deployment.
 
 ```
 Course-Management-System/
-│
-├── FrontEnd/                 # Original static site (HTML/CSS/JS)
-│
-├── react-frontend/           # React (Vite) app
-│   ├── public/style.css      # original stylesheet
-│   └── src/
-│       ├── services/api.js   # axios instance -> http://localhost:5000
-│       ├── context/          # CourseContext (useCourses), AuthContext (useAuth)
-│       ├── hooks/            # useRequireAdmin
-│       ├── components/       # Footer, StudentNav, AdminGate, PageMeta
-│       ├── pages/            # one component per page
-│       ├── App.jsx           # route table
-│       └── main.jsx          # wraps <App /> in the providers
-│
-├── backend/                  # Express server (port 5000)
-│   ├── server.js             # entry point: middleware, routes, 404 + error handlers
-│   ├── config/               # settings from .env, CORS options
-│   ├── routes/               # URL -> controller (courseRoutes, authRoutes, ...)
-│   ├── controllers/          # read the request, send { success, message, data }
-│   ├── services/             # business logic (progress, notifications, auth, ...)
-│   ├── models/               # data access to data/db.json
-│   ├── middleware/           # auth, validation, notFound, error handler
-│   ├── utils/                # password hashing, sessions, helpers, HttpError
-│   ├── data/db.json          # courses, students, enrollments, modules
-│   ├── .env                  # PORT, admin login, etc. (see .env.example)
-│   └── package.json
-│
-├── mockapi/                  # (old) json-server mock API — no longer used
-├── make_react_pages.py       # the HTML -> JSX conversion script used for the React migration
-└── README.md
+├── backend/                 Express API  (deploy to Render)
+│   ├── config/              env settings, MongoDB connection, Socket.IO, CORS rule
+│   ├── models/              User, Course, CourseModule, Enrollment, LearningProgress, Notification, Message
+│   ├── controllers/         thin request handlers
+│   ├── services/            business rules (progress maths, cascades, notifications)
+│   ├── routes/              URL -> middleware -> controller
+│   ├── middleware/          auth (JWT), roles, validation, rate limit, 404, error handler
+│   ├── validators/          express-validator rules
+│   ├── scripts/             createAdmin.js, seed.js
+│   ├── tests/               automated end-to-end tests (node:test)
+│   ├── data/seed/           starter catalog (11 courses, 9 modules)
+│   ├── .env.example
+│   └── server.js
+├── react-frontend/          React app  (deploy to Vercel)
+│   ├── src/api/             axios client, auth API, Socket.IO client
+│   ├── src/context/         Auth, Course and Socket providers
+│   ├── src/pages/           one component per screen (incl. Chat, Notifications)
+│   ├── vercel.json
+│   └── .env.example
+├── docs/
+│   ├── DATABASE.md          ER diagram, schemas, indexes, cascade rules
+│   ├── TESTING.md           manual / Postman test matrix + how to run automated tests
+│   └── DEPLOYMENT.md        Atlas + Render + Vercel step-by-step
+├── render.yaml              optional Render blueprint
+└── legacy/                  the original static site and JSON mock server (not used any more)
 ```
 
-## 🚀 Getting Started
+---
 
-### Clone the repository
+## 1. Run it locally
 
-```bash
-git clone https://github.com/dharshini-36/Course-Management-System.git
-cd Course-Management-System
-```
+You need **Node.js 20+** and a **MongoDB** (local install, Docker, or a free Atlas cluster).
 
-### Option A — Run the original static site
+### Backend
 
-Open `FrontEnd/index.html` directly in your browser, or use the VS Code **Live Server** extension:
-
-```
-Right Click on FrontEnd/index.html → Open with Live Server
-```
-
-### Option B — Run the React app + backend (recommended)
-
-Two terminals, both left running.
-
-**Terminal 1 — Backend**
 ```bash
 cd backend
 npm install
-npm run dev
-# -> [nodemon] starting `node server.js`
-# -> Server running on http://localhost:5000
+cp .env.example .env          # Windows: copy .env.example .env
 ```
-(`npm start` runs it without auto-restart.)
 
-**Terminal 2 — React app**
+Edit `.env`:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/faceprep_course_system
+JWT_SECRET=<long random string>
+JWT_EXPIRES_IN=1h
+CLIENT_URL=http://localhost:5173
+```
+
+Make a secret with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+
+```bash
+npm run seed                                  # loads the 11 starter courses + 9 modules (safe to repeat)
+ADMIN_EMAIL=admin@yourschool.edu ADMIN_PASSWORD='ChooseA-Long-Password1' npm run create-admin
+npm run dev                                   # http://localhost:5000
+```
+
+> **Windows PowerShell:** set the variables first —
+> `$env:ADMIN_EMAIL="admin@yourschool.edu"; $env:ADMIN_PASSWORD="ChooseA-Long-Password1"; npm run create-admin`
+
+Check it: open <http://localhost:5000/api/health> → `{"status":"ok","message":"API is running"}`
+
+Optional demo account: `npm run seed -- --demo-student` creates `demo@studyverse.com` / `DemoStudent#2026`.
+
+### Frontend
+
 ```bash
 cd react-frontend
 npm install
-npm run dev
-# -> Local: http://localhost:5173/
+npm run dev                                   # http://localhost:5173
 ```
 
-> Requires **Node.js 20.19+ or 22.12+**. Check with `node --version`.
+By default the app talks to `http://localhost:5000/api/v1`. To change it, copy
+`.env.example` to `.env` and set `VITE_API_URL`.
 
-**Logins for testing**
+---
 
-| Role    | Email                  | Password      |
-| ------- | ---------------------- | ------------- |
-| Student | `demo@studyverse.com`  | `demo1234`    |
-| Admin   | `admin@institute.edu`  | `password123` |
+## 2. What changed from the previous version
 
-New students can register on the Register page. Change the admin login with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` environment variables when starting the backend.
+| Before | Now |
+|---|---|
+| Data kept in a JSON file (`db.json`) | MongoDB collections through Mongoose models, with unique indexes and references |
+| Admin = email + password in `.env` | Admin is a normal `User` with `role: "admin"`, created by `npm run create-admin`; one login flow, one bcrypt strategy |
+| Progress stored inside the enrollment | Separate `LearningProgress` collection; totals and percentage are computed on the server |
+| Notifications generated on the fly | Stored in a `notifications` collection and pushed live over WebSockets |
+| No chat | Authenticated one-to-one chat (Socket.IO) with stored history |
+| Public enrollment list; open CORS in dev | Enrollment list is admin-only; helmet, CORS allow-list, rate limiting, validation, central error handling |
+| Course ids like `ai1` | MongoDB ObjectIds (the old id is kept as the `slug` field) |
 
-### Quick checks
+---
 
-- `http://localhost:5000` → `{ "message": "Student Course Management API is running" }`
-- `http://localhost:5000/api/health` → `{ "success": true, "message": "Backend is healthy", ... }`
-- `http://localhost:5000/api/v1/courses` → `{ "success": true, "count": 11, "data": [...] }`
-- `http://localhost:5000/api/v1/courses/999` → `{ "success": false, "message": "Course not found" }`
-- `http://localhost:5000/api/hello` → `{ "success": false, "message": "Route not found: /api/hello" }`
-- Register a student, then open `http://localhost:5000/api/v1/students` — the new entry appears
-- Enroll in a course, then open `http://localhost:5000/api/v1/enrollments`
+## 3. API summary (all under `/api/v1`)
 
-### API
+| Method | Path | Access | Purpose |
+|---|---|---|---|
+| POST | `/auth/register` | public | Register a **student** (role cannot be chosen) |
+| POST | `/auth/login` | public (rate-limited) | Log in → `{ token, role, student }` |
+| POST | `/auth/admin-login` | public (rate-limited) | Same, but only accepts admins |
+| GET | `/auth/me` | any logged-in user | Who owns this token |
+| POST | `/auth/forgot-password`, `/auth/reset-password` | public | Password reset (link is printed in the server terminal) |
+| GET/POST/PUT/DELETE | `/students`, `/students/:id` | **admin** | Student CRUD (deleting cascades) |
+| GET / PUT | `/profile` | logged-in | Own profile (name, department) |
+| GET | `/courses`, `/courses/:id`, `/courses/:id/module` | public | Catalog (optional `?page=&limit=`) |
+| POST/PUT/DELETE | `/courses`, `/courses/:id` | **admin** | Course CRUD (deleting cascades) |
+| GET | `/enrollments` | **admin** | All enrollments |
+| POST | `/enrollments` | student | Enrol (`{ courseId, roll }`) |
+| GET/PATCH/DELETE | `/enrollments/:id` | owner or admin | Read, update progress, withdraw |
+| DELETE | `/enrollments` | **admin** | Clear all |
+| GET | `/me/enrollments` | student | My enrollments |
+| GET / GET / PUT | `/learning-progress`, `/learning-progress/:courseId` | student | My progress (PUT: `{ units:[…] }` or `{ video:true }`) |
+| GET | `/notifications` | logged-in | My notifications + `unreadCount` |
+| PATCH | `/notifications/:id/read`, `/notifications/read-all` | logged-in | Mark as read |
+| GET | `/messages/contacts`, `/messages/:userId` | logged-in | Chat contacts / conversation history |
+| GET | `/stats` | **admin** | Counts |
+| GET | `/api/health` | public | Health check (outside `/v1`) |
 
-Every response uses the same shape: `{ success, message?, count?, data }`; errors are `{ success: false, message }`.
+**Socket.IO** (same server URL): connect with `auth: { token }`.
+Client → server: `send_message { recipientId, text }` (with acknowledgement).
+Server → client: `receive_message`, `new_notification`.
 
-| Method | Route | Who |
-| ------ | ----- | --- |
-| GET | `/`, `/api/health` | anyone |
-| GET | `/api/v1/courses`, `/api/v1/courses/:id`, `/api/v1/courses/:id/module` | anyone |
-| POST / PUT / DELETE | `/api/v1/courses`, `/api/v1/courses/:id` | admin (POST is validated) |
-| GET / POST | `/api/v1/students` (POST = register) | anyone |
-| GET | `/api/v1/enrollments`, `/api/v1/enrollments/:id` | anyone |
-| POST | `/api/v1/enrollments` | logged-in student |
-| PATCH / DELETE | `/api/v1/enrollments/:id` | the owning student, or admin |
-| DELETE | `/api/v1/enrollments` (clear all) | admin |
-| POST | `/api/v1/auth/login`, `/admin-login`, `/logout`, `/forgot-password`, `/reset-password` | anyone |
-| GET | `/api/v1/auth/me`, `/api/v1/me/enrollments`, `/api/v1/me/notifications` | session |
-| POST | `/api/v1/me/notifications/read` | logged-in student |
-| GET | `/api/v1/modules`, `/api/v1/stats` | anyone |
+Errors always look like `{ "success": false, "message": "…" }` (validation errors add an `errors` list).
+Status codes: `400` invalid input · `401` not logged in / bad token · `403` not allowed · `404` not found · `409` duplicate · `429` too many attempts · `500` server error.
 
-Completion status is calculated by the backend from a student's saved progress, so it can't be faked from the browser.
+---
 
-Settings live in `backend/.env` (`PORT`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `FRONTEND_URL`, `SESSION_SECRET`).
+## 4. Tests
 
-### Common mistakes to avoid
+```bash
+cd backend
+npm test            # needs MongoDB running; set TEST_MONGO_URI if it is not on localhost
+```
 
-- **Backend not running.** If courses don't load or nothing saves, make sure `npm run dev` is running inside `backend/`.
-- **Wrong address.** `react-frontend/src/services/api.js` must point at port **5000** (the backend). Stop the old json-server mockapi so the two don't clash. Override with `VITE_API_URL` in `react-frontend/.env` if needed.
-- **Missing `backend/data/db.json`.** The server now creates an empty one if it's missing, but you'll lose the seeded courses.
+59 automated tests start the real server against a temporary database and
+check registration, login, JWT, roles, CRUD, enrolment, progress,
+notifications, WebSocket chat, CORS, rate limiting and cascade deletes.
+See [docs/TESTING.md](docs/TESTING.md) for the manual (Postman) checklist.
 
-## 📸 Screenshots
+---
 
-_Add screenshots of the application here._
+## 5. Deploy
 
-### Home Page
+Atlas (database) → Render (backend) → Vercel (frontend). Full steps and the
+environment variables for each are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Your live URLs go here after you deploy:
 
-![Home Page](screenshots/home.png)
+* Frontend (Vercel): `https://<your-app>.vercel.app`
+* Backend (Render): `https://<your-api>.onrender.com`
+* Health check: `https://<your-api>.onrender.com/api/health`
 
-### Courses Page
+---
 
-![Courses](screenshots/courses.png)
+## 6. Notes and decisions
 
-### Student Dashboard
-
-![Dashboard](screenshots/dashboard.png)
-
-## 🎯 Learning Outcomes
-
-Through this project, I gained practical experience in:
-
-- Frontend web development with vanilla HTML/CSS/JavaScript
-- Converting a multi-page static site into a component-based React application
-- Routing strategy in React Router, including handling legacy script constraints
-- Bridging imperative, DOM-dependent legacy JavaScript into a React component lifecycle
-- Building a REST API with Express and consuming it from React with axios and Context
-- Debugging real framework-level issues (React StrictMode double-invocation, async script loading, CORS)
-- Project structuring and version control using Git
-
-## 🔮 Future Enhancements
-
-- Move from the JSON file to a real database (MongoDB / PostgreSQL)
-- Send password-reset links by email (right now the link is printed in the backend terminal)
-- Instructor dashboard
-- Assignment submission module
-- Attendance tracking
-- Deploy the backend to a real host and point the React app at it (`VITE_API_URL`)
-- Automated tests (unit + end-to-end)
-
-## 🤝 Contributing
-
-Contributions are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to your branch
-5. Open a Pull Request
-
-## 👩‍💻 Author
-
-**Dharshini**
-
-GitHub: [https://github.com/dharshini-36/Course-Management-System](https://github.com/dharshini-36/Course-Management-System)
-
-## 📄 License
-
-This project is open-source and available under the MIT License.
+* **`duration` is text** (e.g. `"8 Weeks"`), because that is what the course forms and the starter data already use. The Task 9 example uses a number; changing it would break the existing screens.
+* **Passwords must be 12–72 characters** (72 is bcrypt's limit). Accounts created earlier with shorter passwords can still log in until they reset them.
+* **Emails are lower-cased and trimmed, not "normalised".** `express-validator`'s `normalizeEmail()` rewrites Gmail addresses (removes dots, strips `+tags`), so a user could register as `a.b@gmail.com` and then be unable to log in. It is deliberately not used.
+* **The role always comes from MongoDB, not from the token.** Every protected request re-reads the user, so a deleted account or a changed role takes effect immediately and a forged `role` claim is ignored.
+* **Withdrawing is a status change**, not a delete: the enrollment becomes `withdrawn` and keeps its progress; enrolling again reactivates it.
+* **Deleting a student or course cascades** (enrollments, progress, notifications, chat messages / stored content) inside one MongoDB transaction on Atlas. A plain local `mongod` has no transactions, so there it runs step by step.
+* **Chat contacts** are all other accounts (name and role only, never email). Add finer recipient rules in `backend/config/socket.js` if your institution needs them (e.g. students may only message admins).
+* **Password reset has no email service:** the link is printed in the backend log. Plug in an email provider before relying on it in production.
+* **The login rate limit counts per server instance** (in memory). With several instances, use a shared store such as Redis.
+* The JWT is kept in `sessionStorage` (cleared when the tab closes). It is readable by JavaScript, so a high-security deployment would move to HttpOnly cookies.
+* **Your old `.env` contained a real `JWT_SECRET` and admin password.** Do not reuse them: generate a new secret and set a new admin password.

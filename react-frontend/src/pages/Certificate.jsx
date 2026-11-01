@@ -4,7 +4,7 @@ import PageMeta from "../components/PageMeta";
 import StudentNav from "../components/StudentNav";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import api from "../api/apiClient";
 
 function formatDate(iso) {
     const d = new Date(iso);
@@ -27,7 +27,7 @@ export default function Certificate() {
         }
         // Only the logged-in student's own enrollments come back from this
         // route, so nobody can view someone else's certificate by guessing a URL.
-        api.get("/api/v1/me/enrollments")
+        api.get("/me/enrollments")
             .then(({ data }) => setRecord(data.data.find((e) => e.courseId === courseId) || null))
             .catch(() => setRecord(null));
     }, [authLoading, student, courseId, navigate]);

@@ -1,9 +1,10 @@
-// An error that carries an HTTP status code. Services throw it; the global
-// error middleware turns it into a { success: false, message } response.
+// An error that carries an HTTP status code. Services throw it; the central
+// error handler turns it into a { success: false, message } response.
 class HttpError extends Error {
-    constructor(statusCode, message) {
+    constructor(status, message) {
         super(message);
-        this.statusCode = statusCode;
+        this.status = status;
+        this.statusCode = status;
     }
 }
 
